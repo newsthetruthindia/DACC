@@ -55,6 +55,11 @@ cp .env.local.example .env.local    # Configure your environment variables
 npm run dev
 ```
 
+### ☁️ Vercel Deployment Settings
+When deploying the frontend on Vercel, configure the project settings as follows:
+- **Root Directory**: `frontend`
+- **Framework Preset**: `Next.js`
+
 ## 🔐 Environment Variables
 
 ### Backend (`.env`)
