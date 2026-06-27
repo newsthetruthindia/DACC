@@ -78,9 +78,10 @@ export default function AppLayout({ children }) {
 
         {isAdmin && <>
           <p className="text-[9px] font-bold uppercase tracking-widest text-white/25 px-2 py-1.5 mt-3">Admin</p>
-          {navItem('/admin/members', '🗂', 'All Members')}
-          {navItem('/admin/panel',   '⚙', 'Manage Panel')}
-          {navItem('/admin/terms',   '📅', 'Club Terms')}
+          {navItem('/admin/members',  '🗂', 'All Members')}
+          {navItem('/admin/panel',    '⚙', 'Manage Panel')}
+          {navItem('/admin/terms',    '📅', 'Club Terms')}
+          {navItem('/admin/settings', '🏦', 'Bank & UPI Settings')}
         </>}
       </nav>
 

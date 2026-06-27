@@ -69,6 +69,13 @@ export const api = {
   terms:          ()     => request('GET',  '/terms'),
   createTerm:     (b)    => request('POST', '/terms', b),
   activateTerm:   (id)   => request('POST', `/terms/${id}/activate`),
+
+  // Admin Members & Settings
+  createMember:   (b)    => request('POST', '/members', b),
+  updateMember:   (id,b) => request('PATCH',`/members/${id}`, b),
+  deleteMember:   (id)   => request('DELETE',`/members/${id}`),
+  getSettings:    ()     => request('GET',  '/settings'),
+  updateSettings: (b)    => request('PATCH','/settings', b),
 };
 
 export const PLANS = {

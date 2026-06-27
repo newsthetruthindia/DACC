@@ -101,11 +101,41 @@ router.patch('/:id/suspend', protect, restrictTo('SUPER_ADMIN'), async (req, res
   }
 });
 
+// ── POST /members (Admin create member) ───────────────────────
+router.post('/', protect, restrictTo('SUPER_ADMIN', 'PANEL'), async (req, res) => {
+  try {
+    const { fname, lname, email, phone, plan, role, city, password } = req.body;
+    const exists = await User.findOne({ email });
+    if (exists) return res.status(400).json({ success: false, error: 'Email already exists' });
+    
+    const user = await User.create({
+      fname, lname, email, phone, plan: plan || 'SILVER', role: role || 'MEMBER', city: city || '', status: 'ACTIVE', passwordHash: password || 'demo123'
+    });
+    res.json({ success: true, data: user });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ── PATCH /members/:id (Admin edit member) ────────────────────
+router.patch('/:id', protect, restrictTo('SUPER_ADMIN', 'PANEL'), async (req, res) => {
+  try {
+    const allowed = ['fname', 'lname', 'email', 'phone', 'plan', 'role', 'status', 'city'];
+    const updates = {};
+    allowed.forEach(k => { if (req.body[k] !== undefined) updates[k] = req.body[k]; });
+    const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true }).select('-passwordHash');
+    res.json({ success: true, data: user });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // ── DELETE /members/:id ───────────────────────────────────────
 router.delete('/:id', protect, restrictTo('SUPER_ADMIN'), async (req, res) => {
   try {
-    await User.findByIdAndUpdate(req.params.id, { status: 'INACTIVE' });
-    res.json({ success: true, message: 'Member deactivated' });
+    await User.findByIdAndDelete(req.params.id);
+    await Payment.deleteMany({ userId: req.params.id });
+    res.json({ success: true, message: 'Member deleted completely' });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

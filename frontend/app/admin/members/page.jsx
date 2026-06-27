@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import AppLayout from '@/components/AppLayout';
 import { Card, CardHeader, Btn, Badge, Loading, Empty, UpiModal, toast } from '@/components/ui';
-import { api, PLANS, fmtTime, currentMonth } from '@/lib/api';
+import { api, PLANS, currentMonth } from '@/lib/api';
 
 export default function AdminMembersPage() {
   const [members, setMembers] = useState([]);
@@ -12,6 +12,10 @@ export default function AdminMembersPage() {
   const [filterPlan, setFP]   = useState('');
   const [upi, setUpi]         = useState(null);
   const [loading, setLoading] = useState(true);
+  const [modalMode, setModalMode] = useState(null); // 'ADD' or 'EDIT'
+  const [activeMember, setActiveMember] = useState(null);
+  const [form, setForm] = useState({ fname: '', lname: '', email: '', phone: '', plan: 'SILVER', role: 'MEMBER', status: 'ACTIVE', city: '', password: '' });
+
   const month = currentMonth();
 
   const load = () => {
@@ -40,6 +44,42 @@ export default function AdminMembersPage() {
     load();
   };
 
+  const deleteMem = async (id, name) => {
+    if (!confirm(`Are you sure you want to permanently delete ${name}?`)) return;
+    await api.deleteMember(id);
+    toast(`${name} deleted permanently`);
+    load();
+  };
+
+  const openAdd = () => {
+    setForm({ fname: '', lname: '', email: '', phone: '', plan: 'SILVER', role: 'MEMBER', status: 'ACTIVE', city: '', password: 'demo123' });
+    setActiveMember(null);
+    setModalMode('ADD');
+  };
+
+  const openEdit = (m) => {
+    setActiveMember(m);
+    setForm({ fname: m.fname, lname: m.lname, email: m.email, phone: m.phone, plan: m.plan, role: m.role, status: m.status, city: m.city || '' });
+    setModalMode('EDIT');
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (modalMode === 'ADD') {
+        await api.createMember(form);
+        toast('New member created successfully ✓');
+      } else {
+        await api.updateMember(activeMember._id, form);
+        toast('Member updated successfully ✓');
+      }
+      setModalMode(null);
+      load();
+    } catch (err) {
+      toast(err.message || 'Error occurred');
+    }
+  };
+
   const openUpi = async (m) => {
     const u = m;
     const pl = PLANS[u.plan] || PLANS.SILVER;
@@ -61,9 +101,12 @@ export default function AdminMembersPage() {
 
   return (
     <AppLayout>
-      <div className="mb-6">
-        <h1 className="text-2xl font-extrabold text-[#1a1916] tracking-tight">All Members</h1>
-        <p className="text-sm text-[#9a9890] mt-1">{total} members registered</p>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-extrabold text-[#1a1916] tracking-tight">All Members</h1>
+          <p className="text-sm text-[#9a9890] mt-1">{total} members registered</p>
+        </div>
+        <Btn variant="primary" onClick={openAdd}>➕ Add Member</Btn>
       </div>
 
       {/* Filters */}
@@ -118,6 +161,7 @@ export default function AdminMembersPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex gap-1.5 flex-wrap">
+                          <Btn size="sm" variant="ghost" onClick={()=>openEdit(m)}>✏️ Edit</Btn>
                           {m.status === 'PENDING' && (
                             <Btn size="sm" variant="dark" onClick={()=>approve(m._id, m.fname)}>Approve</Btn>
                           )}
@@ -128,6 +172,7 @@ export default function AdminMembersPage() {
                             onClick={()=>suspend(m._id, m.status, m.fname)}>
                             {m.status==='SUSPENDED'?'Restore':'Suspend'}
                           </Btn>
+                          <Btn size="sm" variant="red" onClick={()=>deleteMem(m._id, m.fname)}>🗑️ Delete</Btn>
                         </div>
                       </td>
                     </tr>
@@ -137,6 +182,79 @@ export default function AdminMembersPage() {
           </tbody>
         </table>
       </Card>
+
+      {/* Add/Edit Modal */}
+      {modalMode && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg font-bold text-[#1a1916] mb-4">
+              {modalMode === 'ADD' ? '➕ Add New Member' : '✏️ Edit Member Details'}
+            </h2>
+            <form onSubmit={handleFormSubmit} className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-[#9a9890] mb-1">First Name</label>
+                  <input required value={form.fname} onChange={e=>setForm({...form, fname: e.target.value})} className="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:border-[#c8410a]" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-[#9a9890] mb-1">Last Name</label>
+                  <input required value={form.lname} onChange={e=>setForm({...form, lname: e.target.value})} className="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:border-[#c8410a]" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase text-[#9a9890] mb-1">Email</label>
+                <input required type="email" value={form.email} onChange={e=>setForm({...form, email: e.target.value})} className="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:border-[#c8410a]" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase text-[#9a9890] mb-1">Phone</label>
+                <input required value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:border-[#c8410a]" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase text-[#9a9890] mb-1">City</label>
+                <input value={form.city} onChange={e=>setForm({...form, city: e.target.value})} className="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:border-[#c8410a]" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-[#9a9890] mb-1">Membership Plan</label>
+                  <select value={form.plan} onChange={e=>setForm({...form, plan: e.target.value})} className="w-full px-3 py-2 border rounded-xl text-sm bg-white">
+                    <option value="SILVER">Silver (₹300)</option>
+                    <option value="GOLD">Gold (₹500)</option>
+                    <option value="PLATINUM">Platinum (₹1000)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-[#9a9890] mb-1">Role</label>
+                  <select value={form.role} onChange={e=>setForm({...form, role: e.target.value})} className="w-full px-3 py-2 border rounded-xl text-sm bg-white">
+                    <option value="MEMBER">Member</option>
+                    <option value="PANEL">Panel</option>
+                    <option value="SUPER_ADMIN">Super Admin</option>
+                  </select>
+                </div>
+              </div>
+              {modalMode === 'EDIT' && (
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-[#9a9890] mb-1">Status</label>
+                  <select value={form.status} onChange={e=>setForm({...form, status: e.target.value})} className="w-full px-3 py-2 border rounded-xl text-sm bg-white">
+                    <option value="ACTIVE">Active</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="SUSPENDED">Suspended</option>
+                  </select>
+                </div>
+              )}
+              {modalMode === 'ADD' && (
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-[#9a9890] mb-1">Initial Password</label>
+                  <input value={form.password} onChange={e=>setForm({...form, password: e.target.value})} placeholder="Default: demo123" className="w-full px-3 py-2 border rounded-xl text-sm outline-none focus:border-[#c8410a]" />
+                </div>
+              )}
+              <div className="flex justify-end gap-2 pt-4 border-t">
+                <Btn variant="ghost" onClick={()=>setModalMode(null)}>Cancel</Btn>
+                <Btn variant="primary" type="submit">{modalMode === 'ADD' ? 'Create Member' : 'Save Changes'}</Btn>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {upi && (
         <UpiModal open={!!upi} link={upi.link} amount={upi.amount} month={month}
