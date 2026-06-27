@@ -6,12 +6,19 @@ const { PLANS, currentMonth } = require('../lib/plans');
 // ── GET /members/me ───────────────────────────────────────────
 router.get('/me', protect, async (req, res) => {
   try {
-    const payments = await Payment.find({ userId: req.user._id }).sort({ forMonth: -1 }).limit(12);
+    const payments = await Payment.find({ userId: req.user._id }).sort({ createdAt: -1 });
     const month = currentMonth();
-    const paidThisMonth = payments.some(p => p.forMonth === month && p.status === 'CONFIRMED');
+    const paidThisMonth = payments.some(p => p.forMonth === month && (p.status === 'CONFIRMED' || p.status === 'PENDING'));
+    
+    // Check overdue (> 30 days since registration or last payment)
+    const latestPay = payments.find(p => p.status === 'CONFIRMED' || p.status === 'PENDING');
+    const referenceDate = latestPay ? new Date(latestPay.createdAt || Date.now()) : new Date(req.user.createdAt || Date.now());
+    const daysDiff = (Date.now() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
+    const isOverdue = req.user.role !== 'SUPER_ADMIN' && daysDiff > 30 && !paidThisMonth;
+
     res.json({
       success: true,
-      data: { ...req.user.toObject(), payments, paidThisMonth }
+      data: { ...req.user.toObject(), payments: payments.slice(0, 12), paidThisMonth, isOverdue, daysDiff: Math.floor(daysDiff) }
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
