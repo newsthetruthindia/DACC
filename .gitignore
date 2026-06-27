@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/.next/cache/
+
+# Build output
+frontend/.vercel
+frontend/build/
+backend/dist/
+
+# Uploads (user-generated content)
+backend/uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Junk directories (accidentally created from shell brace expansion)
+{backend
+frontend/app/{login,register,dashboard,notifications,messages,subscription,panel,profile,panel
+frontend/app/{register,dashboard,notifications,messages,subscription,panel,profile}
