@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import AppLayout from '@/components/AppLayout';
 import { Card, CardHeader, Btn, Badge, Loading, Empty, UpiModal, toast } from '@/components/ui';
-import { api, PLANS, currentMonth } from '@/lib/api';
+import { api, PLANS, currentMonth, getUser } from '@/lib/api';
 
 export default function AdminMembersPage() {
   const [members, setMembers] = useState([]);
@@ -15,6 +15,9 @@ export default function AdminMembersPage() {
   const [modalMode, setModalMode] = useState(null); // 'ADD' or 'EDIT'
   const [activeMember, setActiveMember] = useState(null);
   const [form, setForm] = useState({ fname: '', lname: '', email: '', phone: '', plan: 'SILVER', role: 'MEMBER', status: 'ACTIVE', city: '', password: '' });
+
+  const currentUser = getUser();
+  const isSuperAdmin = currentUser?.role === 'SUPER_ADMIN';
 
   const month = currentMonth();
 
@@ -106,7 +109,7 @@ export default function AdminMembersPage() {
           <h1 className="text-2xl font-extrabold text-[#1a1916] tracking-tight">All Members</h1>
           <p className="text-sm text-[#9a9890] mt-1">{total} members registered</p>
         </div>
-        <Btn variant="primary" onClick={openAdd}>➕ Add Member</Btn>
+        {isSuperAdmin && <Btn variant="primary" onClick={openAdd}>➕ Add Member</Btn>}
       </div>
 
       {/* Filters */}
@@ -172,7 +175,7 @@ export default function AdminMembersPage() {
                             onClick={()=>suspend(m._id, m.status, m.fname)}>
                             {m.status==='SUSPENDED'?'Restore':'Suspend'}
                           </Btn>
-                          <Btn size="sm" variant="red" onClick={()=>deleteMem(m._id, m.fname)}>🗑️ Delete</Btn>
+                          {isSuperAdmin && <Btn size="sm" variant="red" onClick={()=>deleteMem(m._id, m.fname)}>🗑️ Delete</Btn>}
                         </div>
                       </td>
                     </tr>
