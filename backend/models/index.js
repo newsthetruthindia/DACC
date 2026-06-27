@@ -80,12 +80,23 @@ const OtpSchema = new Schema({
 }, { timestamps: true });
 OtpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
+// ── FundTransaction (Club Expenses & Income Ledger) ───────────
+const FundTransactionSchema = new Schema({
+  title:    { type: String, required: true },
+  type:     { type: String, enum: ['INCOME', 'EXPENSE'], required: true },
+  category: { type: String, default: 'General' },
+  amount:   { type: Number, required: true },
+  date:     { type: Date, default: Date.now },
+  addedBy:  { type: Schema.Types.ObjectId, ref: 'User', default: null },
+}, { timestamps: true });
+
 module.exports = {
-  User:         mongoose.model('User', UserSchema),
-  ClubTerm:     mongoose.model('ClubTerm', ClubTermSchema),
-  PanelMember:  mongoose.model('PanelMember', PanelMemberSchema),
-  Payment:      mongoose.model('Payment', PaymentSchema),
-  Notification: mongoose.model('Notification', NotificationSchema),
-  Message:      mongoose.model('Message', MessageSchema),
-  OtpCode:      mongoose.model('OtpCode', OtpSchema),
+  User:            mongoose.model('User', UserSchema),
+  ClubTerm:        mongoose.model('ClubTerm', ClubTermSchema),
+  PanelMember:     mongoose.model('PanelMember', PanelMemberSchema),
+  Payment:         mongoose.model('Payment', PaymentSchema),
+  Notification:    mongoose.model('Notification', NotificationSchema),
+  Message:         mongoose.model('Message', MessageSchema),
+  OtpCode:         mongoose.model('OtpCode', OtpSchema),
+  FundTransaction: mongoose.model('FundTransaction', FundTransactionSchema),
 };

@@ -33,6 +33,7 @@ app.use('/api/v1/messages',      require('./routes/messages'));
 app.use('/api/v1/panel',         require('./routes/panel'));
 app.use('/api/v1/terms',         require('./routes/terms'));
 app.use('/api/v1/settings',      require('./routes/settings'));
+app.use('/api/v1/funds',         require('./routes/funds'));
 
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok', club: 'Agnichakra Club' }));

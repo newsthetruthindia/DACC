@@ -76,6 +76,11 @@ export const api = {
   deleteMember:   (id)   => request('DELETE',`/members/${id}`),
   getSettings:    ()     => request('GET',  '/settings'),
   updateSettings: (b)    => request('PATCH','/settings', b),
+
+  // Transparent Ledger / Funds
+  getFunds:       ()     => request('GET',  '/funds'),
+  createFundTx:   (b)    => request('POST', '/funds', b),
+  deleteFundTx:   (id)   => request('DELETE',`/funds/${id}`),
 };
 
 export const PLANS = {

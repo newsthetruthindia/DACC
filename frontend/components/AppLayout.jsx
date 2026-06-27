@@ -79,6 +79,7 @@ export default function AppLayout({ children }) {
       <nav className="flex-1 px-2.5 py-3 overflow-y-auto space-y-0.5">
         <p className="text-[9px] font-bold uppercase tracking-widest text-white/25 px-2 py-1.5 mt-1">Main</p>
         {navItem('/dashboard',     '⊞', 'Dashboard')}
+        {navItem('/funds',         '📊', 'Funds & Expenses')}
         {navItem('/notifications', '🔔', 'Notifications', unread)}
         {navItem('/messages',      '✉', 'Write to Panel')}
         {navItem('/subscription',  '💳', 'Subscription')}
