@@ -1,21 +1,27 @@
-const { execSync } = require('child_process');
+const { Client } = require('ssh2');
+const conn = new Client();
 
-const VPS_IP = '117.252.16.132';
-const VPS_USER = 'root';
-const CRON_CMD = '0 3 * * * cd /root/agnichakra/backend && /usr/bin/node cron_runner.js >> /var/log/agnichakra_cron.log 2>&1';
+const CRON_CMD = '0 3 * * * cd /root/DACC/backend && /usr/bin/node cron_runner.js >> /var/log/agnichakra_cron.log 2>&1';
 
-console.log(`[VPS Cron Setup] Setting up daily backup & 1st/16th automated reminder cron job on ${VPS_IP}...`);
+const commands = `
+echo "[VPS Cron Setup] Installing crontab..."
+(crontab -l 2>/dev/null | grep -v 'cron_runner.js'; echo '${CRON_CMD}') | crontab -
+crontab -l | grep cron_runner.js
+echo "[VPS Cron Setup] Running verification backup test on VPS..."
+cd /root/DACC/backend
+node cron_runner.js
+ls -lh backups/
+`;
 
-try {
-  // Check if crontab entry already exists or add it
-  const sshCmd = `ssh -o StrictHostKeyChecking=no ${VPS_USER}@${VPS_IP} "(crontab -l 2>/dev/null | grep -v 'cron_runner.js'; echo '${CRON_CMD}') | crontab -"`;
-  execSync(sshCmd, { stdio: 'inherit' });
-  console.log(`[VPS Cron Setup] Successfully installed crontab entry on VPS!`);
-  
-  // Also run a test run of the cron right now to verify backup creation
-  console.log(`[VPS Cron Setup] Running initial verification backup test on VPS...`);
-  execSync(`ssh -o StrictHostKeyChecking=no ${VPS_USER}@${VPS_IP} "cd /root/agnichakra/backend && node cron_runner.js"`, { stdio: 'inherit' });
-  console.log(`[VPS Cron Setup] Initial verification complete!`);
-} catch (err) {
-  console.error(`[VPS Cron Setup] Failed:`, err.message);
-}
+console.log('[VPS Cron Setup] Connecting to VPS via SSH2...');
+conn.on('ready', () => {
+  conn.exec(commands, (err, stream) => {
+    if (err) throw err;
+    stream.on('close', (code, signal) => {
+      console.log('[VPS Cron Setup] Completed with code ' + code);
+      conn.end();
+    })
+    .on('data', d => process.stdout.write(d))
+    .stderr.on('data', d => process.stderr.write(d));
+  });
+}).connect({ host: '117.252.16.132', port: 22, username: 'root', password: '$9T%Lk057bzu' });
