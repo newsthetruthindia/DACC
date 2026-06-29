@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const { User, Payment, FundTransaction, Message, ClubTerm, Notification } = require('./models');
 const { currentMonth, PLANS, buildUpiLink } = require('./lib/plans');
 const { sendPaymentReminder } = require('./lib/email');
+const { sendTelegramMessage, sendGroupAlert } = require('./lib/telegram');
 
 const BACKUP_DIR = path.join(__dirname, 'backups');
 if (!fs.existsSync(BACKUP_DIR)) {
@@ -63,13 +64,20 @@ async function runCron() {
       const unpaid = await User.find({ status: 'ACTIVE', _id: { $nin: [...paidIds] } });
 
       let emailCount = 0;
+      let tgCount = 0;
       for (const u of unpaid) {
         const pl = PLANS[u.plan] || PLANS.SILVER;
         const link = buildUpiLink(u.plan, month);
         await sendPaymentReminder(u.email, u.fname, month, pl.price, link).catch(() => {});
         emailCount++;
+
+        if (u.telegramChatId) {
+          const tgMsg = `🔔 <b>Season Dues Reminder (${month})</b>\n\nDear <b>${u.fname}</b>,\nYour contribution of <b>₹${pl.price}</b> for ${month} is currently pending.\n\n💳 <b>Pay instantly via UPI:</b>\n<a href="${link}">Tap Here to Pay ₹${pl.price}</a>\n\n<i>Or submit cash at the club accounting desk.</i>`;
+          await sendTelegramMessage(u.telegramChatId, tgMsg).catch(() => {});
+          tgCount++;
+        }
       }
-      console.log(`[Cron] Sent payment reminder emails to ${emailCount} active members.`);
+      console.log(`[Cron] Sent reminders: ${emailCount} emails, ${tgCount} Telegram messages.`);
 
       // Create in-app system notification if not already posted today
       const notifTitle = `📢 Season Dues Reminder (${month})`;
@@ -121,6 +129,7 @@ async function runCron() {
           type: 'FINANCIAL_SUMMARY',
           targetRole: 'ALL'
         });
+        await sendGroupAlert(`📊 <b>Monthly Financial Wrap-up (${prevMonth})</b>\n\n• <b>Total Collected:</b> ₹${totalRev.toLocaleString()} (${prevPayments.length} member dues + extra income)\n• <b>Club Costs & Equipment:</b> ₹${expTotal.toLocaleString()}\n• <b>Net Monthly Savings:</b> ₹${netSavings.toLocaleString()}\n\n<i>Full transparent ledger available on portal!</i>`).catch(() => {});
         console.log(`[Cron] Posted monthly financial wrap-up announcement!`);
       }
     } catch (err) {

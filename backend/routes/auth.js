@@ -4,6 +4,7 @@ const { User, OtpCode } = require('../models');
 const { protect, signToken } = require('../middleware/auth');
 const { sendOTP, sendWelcome } = require('../lib/email');
 const { PLANS, buildUpiLink, currentMonth } = require('../lib/plans');
+const { sendGroupAlert } = require('../lib/telegram');
 
 // ── POST /auth/register ───────────────────────────────────────
 router.post('/register', async (req, res) => {
@@ -24,8 +25,9 @@ router.post('/register', async (req, res) => {
     const month = currentMonth();
     const upiLink = buildUpiLink(plan, month);
 
-    // Send welcome email (non-blocking)
+    // Send welcome email & Telegram KYC alert (non-blocking)
     sendWelcome(email, fname, PLANS[plan].label).catch(console.error);
+    sendGroupAlert(`🚨 <b>New Athlete Registration (KYC Pending)</b>\n\n<b>Name:</b> ${fname} ${lname}\n<b>Phone:</b> ${phone}\n<b>Division:</b> ${PLANS[plan].label}\n<b>Aadhaar:</b> •••• •••• ${aadhaar.trim().slice(-4)}\n\n⚠️ <i>Accountants & Admin: Please verify selfie and dues on portal to approve KYC!</i>`).catch(console.error);
 
     res.status(201).json({
       success: true,
@@ -70,6 +72,7 @@ router.post('/login', async (req, res) => {
           plan: user.plan, role: user.role, status: user.status,
           avatarUrl: user.avatarUrl, selfieUrl: user.selfieUrl,
           memberId: user.memberId, aadhaar: user.aadhaar, city: user.city,
+          telegramChatId: user.telegramChatId, telegramUsername: user.telegramUsername,
         }
       }
     });
