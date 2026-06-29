@@ -1,15 +1,15 @@
 'use client';
 import { useEffect, useState } from 'react';
 import AppLayout from '@/components/AppLayout';
-import { Card, CardHeader, CardBody, Btn, Input, Textarea, Loading, Empty, toast } from '@/components/ui';
+import { Card, CardHeader, CardBody, Btn, Input, Textarea, Loading, Empty, toast, Badge } from '@/components/ui';
 import { api, fmtTime } from '@/lib/api';
 
 const TARGETS = [
-  { key:'ALL',      label:'All Members',    desc:'Every member receives this' },
-  { key:'SILVER',   label:'Silver',         desc:'Only Silver members' },
-  { key:'GOLD',     label:'Gold & Above',   desc:'Gold + Platinum members' },
-  { key:'PLATINUM', label:'Platinum Only',  desc:'Platinum members only' },
-  { key:'PANEL',    label:'Panel Only',     desc:'Core panel members only' },
+  { key:'ALL',      label:'📢 All Active Athletes',     desc:'Broadcast immediately to every registered club member' },
+  { key:'SILVER',   label:'🥈 Silver Division Only',    desc:'Target exclusively Silver plan athletes' },
+  { key:'GOLD',     label:'🥇 Gold & Platinum Tiers',   desc:'Target Gold and Platinum division athletes' },
+  { key:'PLATINUM', label:'💎 Platinum VIP Leaders',    desc:'Target Platinum members only' },
+  { key:'PANEL',    label:'🏛️ Core Committee Only',     desc:'Confidential broadcast to executive committee appointees' },
 ];
 
 export default function SendNotifPage() {
@@ -25,12 +25,12 @@ export default function SendNotifPage() {
   }, []);
 
   const send = async () => {
-    if (!title||!body) { toast('Fill title and message','error'); return; }
+    if (!title||!body) { toast('Fill title and message content','error'); return; }
     setSending(true);
     try {
       await api.sendNotif({ title, body, target });
       setTitle(''); setBody(''); setTarget('ALL');
-      toast('Notification sent to members ✓');
+      toast('Broadcast alert published to Portal & Telegram! ✓');
       api.notifications().then(r => setSent(r.data.notifications||[]));
     } catch (err) { toast(err.message,'error'); } finally { setSending(false); }
   };
@@ -39,61 +39,78 @@ export default function SendNotifPage() {
 
   return (
     <AppLayout>
-      <div className="mb-6">
-        <h1 className="text-2xl font-extrabold text-[#1a1916] tracking-tight">Send Notification</h1>
-        <p className="text-sm text-[#9a9890] mt-1">Broadcast announcements to members</p>
+      <div className="flex justify-between items-center mb-8 flex-wrap gap-4 bg-gradient-to-r from-[#14141c] via-[#1a1a26] to-[#14141c] p-6 rounded-3xl border border-zinc-800 shadow-2xl">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-400 text-xs font-bold mb-2 uppercase tracking-wider">
+            Executive Megaphone
+          </div>
+          <h1 className="text-3xl font-black text-white tracking-tight">📣 Broadcast Club Alert</h1>
+          <p className="text-sm text-zinc-300 mt-1 font-medium">Publish official notices to portal feeds and trigger instant Telegram community broadcasts.</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="space-y-5">
-          <Card>
-            <CardHeader><span className="font-bold text-sm text-[#1a1916]">📣 New Announcement</span></CardHeader>
-            <CardBody className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-6 space-y-6">
+          <Card className="bg-[#13131a] border-zinc-800 shadow-xl">
+            <CardHeader className="border-b border-zinc-800/80 bg-zinc-900/50">
+              <span className="font-extrabold text-base text-white">🚀 Compose Megaphone Broadcast</span>
+            </CardHeader>
+            <CardBody className="space-y-5 p-6">
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[#9a9890] mb-2">Send To</div>
-                <div className="space-y-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-3">Select Target Audience</label>
+                <div className="space-y-2.5">
                   {TARGETS.map(t => (
                     <div key={t.key} onClick={() => setTarget(t.key)}
-                      className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${target===t.key ? 'border-[#c8410a] bg-[#fff8f5]' : 'border-[#e2e0d8] hover:border-[#9a9890]'}`}>
-                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${target===t.key ? 'border-[#c8410a]' : 'border-[#9a9890]'}`}>
-                        {target===t.key && <div className="w-2 h-2 rounded-full bg-[#c8410a]" />}
+                      className={`flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all ${target===t.key ? 'border-orange-500 bg-orange-500/10 shadow-lg shadow-orange-500/5' : 'border-zinc-800 bg-[#161620] hover:border-zinc-700'}`}>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${target===t.key ? 'border-orange-500 bg-orange-500' : 'border-zinc-600'}`}>
+                        {target===t.key && <div className="w-2 h-2 rounded-full bg-white" />}
                       </div>
                       <div>
-                        <div className="text-sm font-semibold text-[#1a1916]">{t.label}</div>
-                        <div className="text-xs text-[#9a9890]">{t.desc}</div>
+                        <div className="text-sm font-extrabold text-white">{t.label}</div>
+                        <div className="text-xs text-zinc-400 font-medium">{t.desc}</div>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-              <Input label="Title" value={title} onChange={e=>setTitle(e.target.value)} placeholder="e.g. Monthly Meeting — June 2025" />
-              <Textarea label="Message" value={body} onChange={e=>setBody(e.target.value)} rows={5}
-                placeholder="Write your announcement to members…" />
-              <Btn onClick={send} disabled={sending} className="w-full justify-center">
-                {sending ? 'Sending…' : '📣 Send Notification'}
-              </Btn>
+              <Input label="Announcement Title" value={title} onChange={e=>setTitle(e.target.value)} placeholder="e.g. Annual Monsoon Turf Championship — Registration Open" />
+              <Textarea label="Full Broadcast Content" value={body} onChange={e=>setBody(e.target.value)} rows={5}
+                placeholder="Write the full announcement details. This will also echo to Telegram…" />
+              <button onClick={send} disabled={sending}
+                className="w-full py-4 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-black text-sm rounded-xl shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                <span>{sending ? 'Broadcasting…' : '📣 Publish & Blast Alert →'}</span>
+              </button>
             </CardBody>
           </Card>
         </div>
 
-        <Card>
-          <CardHeader><span className="font-bold text-sm text-[#1a1916]">Sent Notifications</span></CardHeader>
-          {sent.length === 0
-            ? <Empty icon="📭" title="Nothing sent yet" />
-            : sent.map(n => (
-              <div key={n._id} className="px-5 py-4 border-b border-[#e2e0d8] last:border-0">
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <span className="font-semibold text-sm text-[#1a1916]">{n.title}</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#f5f4f0] text-[#9a9890] flex-shrink-0">{n.target}</span>
-                </div>
-                <p className="text-xs text-[#4a4840] line-clamp-2">{n.body}</p>
-                <div className="text-[10px] text-[#9a9890] mt-1.5">
-                  {fmtTime(n.createdAt)} · Read by {n.readBy?.length||0} members
-                </div>
-              </div>
-            ))
-          }
-        </Card>
+        <div className="lg:col-span-6">
+          <Card className="bg-[#13131a] border-zinc-800 shadow-xl overflow-hidden">
+            <CardHeader className="border-b border-zinc-800/80 bg-zinc-900/50">
+              <span className="font-extrabold text-base text-white">Broadcast History ({sent.length})</span>
+            </CardHeader>
+            <div className="divide-y divide-zinc-800/80 max-h-[600px] overflow-y-auto">
+              {sent.length === 0
+                ? <div className="p-12"><Empty icon="📭" title="No Broadcasts Published Yet" sub="Published alerts will be logged here" /></div>
+                : sent.map(n => (
+                  <div key={n._id} className="p-6 hover:bg-zinc-900/40 transition-colors">
+                    <div className="flex items-start justify-between gap-3 mb-2 flex-wrap">
+                      <h3 className="font-extrabold text-base text-white">{n.title}</h3>
+                      <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400">
+                        Target: {n.target}
+                      </span>
+                    </div>
+                    <p className="text-sm text-zinc-300 line-clamp-3 leading-relaxed font-medium bg-[#161620] p-3.5 rounded-xl border border-zinc-800 mt-2">{n.body}</p>
+                    <div className="flex items-center justify-between gap-2 mt-3 text-xs text-zinc-500 font-semibold">
+                      <span>🕒 Published {fmtTime(n.createdAt)}</span>
+                      <span className="text-emerald-400">Read by {n.readBy?.length||0} athletes</span>
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </Card>
+        </div>
       </div>
     </AppLayout>
   );
