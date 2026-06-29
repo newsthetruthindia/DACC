@@ -300,8 +300,17 @@ export default function ClubFundsPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Category</label>
-                  <input placeholder="e.g. Equipment, Event" value={form.category} onChange={e => setForm({...form, category: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500 placeholder:text-zinc-500" />
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Category (Tag)</label>
+                  <select value={form.category} onChange={e => setForm({...form, category: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white font-semibold outline-none focus:border-orange-500">
+                    <option value="Sports Equipment & Kits">🏏 Sports Equipment & Kits</option>
+                    <option value="Turf & Ground Maintenance">⚽ Turf & Ground Maintenance</option>
+                    <option value="Tournament Refreshments">🥤 Tournament Refreshments</option>
+                    <option value="Medical & First Aid">🩺 Medical & First Aid</option>
+                    <option value="Event & Meetup Costs">🏆 Event & Meetup Costs</option>
+                    <option value="Club Desk & Operations">🖥️ Club Desk & Operations</option>
+                    <option value="Donation / Sponsorship">🤝 Donation / Sponsorship</option>
+                    <option value="General">📌 General Expense / Income</option>
+                  </select>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Amount (₹)</label>
