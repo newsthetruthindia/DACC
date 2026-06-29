@@ -2,120 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;1,700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 * {
   box-sizing: border-box;
 }
 
 body {
-  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #070709;
-  color: #f4f4f5;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #0a0a0d;
+  color: #e4e4e7;
   overflow-x: hidden;
-  selection-background-color: #ff5500;
+  selection-background-color: #ea580c;
   selection-color: #ffffff;
+  -webkit-font-smoothing: antialiased;
 }
 
-.font-sports {
-  font-family: 'Chakra Petch', 'Outfit', sans-serif;
-}
-
-/* Athletic custom scrollbar */
+/* Clean, readable custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #070709;
+  background: #0a0a0d;
 }
 ::-webkit-scrollbar-thumb {
   background: #27272a;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #ff5500;
+  background: #3f3f46;
 }
 
-/* Carbon & Glassmorphism Panels */
-.glass-panel {
-  background: rgba(14, 14, 18, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
-}
-
+/* Clean Dark Cards */
 .glass-card {
-  background: linear-gradient(145deg, rgba(22, 22, 28, 0.9) 0%, rgba(12, 12, 16, 0.95) 100%);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.glass-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255, 85, 0, 0.6), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  background-color: #131318;
+  border: 1px solid #27272a;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
 }
 
 .glass-card:hover {
-  border-color: rgba(255, 85, 0, 0.4);
-  box-shadow: 0 14px 40px -10px rgba(255, 85, 0, 0.2);
-  transform: translateY(-3px);
+  border-color: #3f3f46;
 }
 
-.glass-card:hover::before {
-  opacity: 1;
-}
-
-/* Athletic Sports Accents & Buttons */
-.sports-badge {
-  background: linear-gradient(135deg, rgba(255, 85, 0, 0.15) 0%, rgba(255, 180, 0, 0.1) 100%);
-  border: 1px solid rgba(255, 85, 0, 0.4);
-  color: #ff6a00;
-  font-family: 'Chakra Petch', sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.fire-btn {
-  background: linear-gradient(135deg, #ff5500 0%, #e02800 100%);
+/* Premium Primary Button */
+.primary-btn {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   color: #ffffff;
-  font-family: 'Chakra Petch', sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(255, 85, 0, 0.35);
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.fire-btn:hover {
-  background: linear-gradient(135deg, #ff6a00 0%, #f03000 100%);
-  box-shadow: 0 6px 28px rgba(255, 85, 0, 0.6);
-  transform: translateY(-2px);
+.primary-btn:hover {
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+  box-shadow: 0 6px 16px rgba(234, 88, 12, 0.45);
+  transform: translateY(-1px);
 }
 
-/* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Scoreboard glow */
-.text-scoreboard {
-  font-family: 'Chakra Petch', font-mono, sans-serif;
-  text-shadow: 0 0 15px rgba(255, 85, 0, 0.5);
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

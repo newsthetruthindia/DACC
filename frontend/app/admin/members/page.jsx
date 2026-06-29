@@ -35,21 +35,21 @@ export default function AdminMembersPage() {
 
   const approve = async (id, name) => {
     await api.approveMember(id);
-    toast(`${name} roster approved ⚡`);
+    toast(`${name} approved successfully ✓`);
     load();
   };
 
   const suspend = async (id, cur, name) => {
     const status = cur === 'SUSPENDED' ? 'ACTIVE' : 'SUSPENDED';
     await api.suspendMember(id, status);
-    toast(`${name} status updated to ${status} ⚡`);
+    toast(`${name} status changed to ${status}`);
     load();
   };
 
   const deleteMem = async (id, name) => {
-    if (!confirm(`Permanently remove athlete ${name} from club roster?`)) return;
+    if (!confirm(`Are you sure you want to permanently remove ${name}?`)) return;
     await api.deleteMember(id);
-    toast(`${name} removed from club roster`);
+    toast(`${name} removed permanently`);
     load();
   };
 
@@ -70,15 +70,15 @@ export default function AdminMembersPage() {
     try {
       if (modalMode === 'ADD') {
         await api.createMember(form);
-        toast('New athlete added to club roster ⚡');
+        toast('New member added successfully ✓');
       } else {
         await api.updateMember(activeMember._id, form);
-        toast('Roster details updated successfully ⚡');
+        toast('Member updated successfully ✓');
       }
       setModalMode(null);
       load();
     } catch (err) {
-      toast(err.message || 'Error saving details', 'error');
+      toast(err.message || 'Error occurred', 'error');
     }
   };
 
@@ -95,7 +95,7 @@ export default function AdminMembersPage() {
     fd.append('forMonth', month);
     await api.submitPayment(fd).catch(()=>{});
     setUpi(null);
-    toast('Contribution logged for verification');
+    toast('Contribution marked for verification');
     load();
   };
 
@@ -105,81 +105,80 @@ export default function AdminMembersPage() {
     <AppLayout>
       <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
         <div>
-          <div className="flex items-center gap-2 text-[#ff5500] font-sports font-extrabold text-xs uppercase tracking-widest mb-1">
-            ⚡ COMMITTEE ROSTER MANAGEMENT
-          </div>
-          <h1 className="text-3xl font-black font-sports text-white tracking-tight">🗂 CLUB ATHLETES ROSTER</h1>
-          <p className="text-sm text-zinc-400 mt-1">{total} registered athletes in club database</p>
+          <h1 className="text-2xl lg:text-3xl font-extrabold text-white">🗂️ Manage Club Members</h1>
+          <p className="text-sm text-zinc-400 mt-1">{total} total registered members in portal database</p>
         </div>
-        {isSuperAdmin && <Btn variant="primary" onClick={openAdd}>➕ Add New Athlete</Btn>}
+        {isSuperAdmin && <Btn variant="primary" onClick={openAdd}>➕ Add New Member</Btn>}
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 mb-6 flex-wrap">
-        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 Search athlete name, email, phone…"
-          className="flex-1 min-w-[240px] px-4 py-3 border border-white/15 rounded-xl text-sm bg-[#121218] text-white outline-none focus:border-[#ff5500] placeholder:text-zinc-600 shadow-inner" />
+      <div className="flex gap-4 mb-6 flex-wrap">
+        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 Search by name, email, or phone…"
+          className="flex-1 min-w-[240px] px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500 placeholder:text-zinc-500" />
         <select value={filterStatus} onChange={e=>setFS(e.target.value)}
-          className="px-4 py-3 border border-white/15 rounded-xl text-sm bg-[#121218] text-white font-semibold outline-none focus:border-[#ff5500]">
-          <option value="">⚡ All Roster Status</option>
+          className="px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white font-semibold outline-none focus:border-orange-500">
+          <option value="">All Statuses</option>
           {['ACTIVE','PENDING','SUSPENDED','INACTIVE'].map(s=><option key={s} value={s}>{s}</option>)}
         </select>
         <select value={filterPlan} onChange={e=>setFP(e.target.value)}
-          className="px-4 py-3 border border-white/15 rounded-xl text-sm bg-[#121218] text-white font-semibold outline-none focus:border-[#ff5500]">
-          <option value="">🏆 All Divisions</option>
+          className="px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white font-semibold outline-none focus:border-orange-500">
+          <option value="">All Plans</option>
           {['SILVER','GOLD','PLATINUM'].map(p=><option key={p} value={p}>{p}</option>)}
         </select>
       </div>
 
-      <Card className="overflow-hidden border-white/10 shadow-2xl">
-        <CardHeader title="⚡ REGISTERED ATHLETES DIRECTORY" className="bg-white/[0.02] font-sports font-extrabold tracking-wider text-sm text-zinc-200" />
+      <Card className="overflow-hidden">
+        <CardHeader>
+          <span className="font-bold text-white text-base">Registered Members Roster</span>
+        </CardHeader>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-[#121218] text-zinc-400 font-sports font-bold text-[11px] uppercase tracking-widest border-b border-white/10">
-                {['Athlete','Division','Committee Role','Status','Season Dues','Management Controls'].map(h=>(
-                  <th key={h} className="text-left px-5 py-4">{h}</th>
+              <tr className="bg-zinc-900/80 text-zinc-400 font-bold text-xs uppercase tracking-wider border-b border-zinc-800">
+                {['Member Details','Plan','Role','Status','This Month','Actions'].map(h=>(
+                  <th key={h} className="text-left px-6 py-4">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-zinc-800/80">
               {members.length === 0
-                ? <tr><td colSpan={6}><Empty icon="🔍" title="No matching club athletes found" /></td></tr>
+                ? <tr><td colSpan={6}><Empty icon="🔍" title="No matching members found" /></td></tr>
                 : members.map(m => {
                     const pl = PLANS[m.plan] || PLANS.SILVER;
                     return (
-                      <tr key={m._id} className="hover:bg-white/[0.03] transition-colors">
-                        <td className="px-5 py-4">
+                      <tr key={m._id} className="hover:bg-zinc-900/40 transition-colors">
+                        <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-extrabold font-sports text-white flex-shrink-0 shadow border"
-                              style={{ background:`linear-gradient(135deg, ${pl.color}44 0%, #121218 100%)`, borderColor:pl.color }}>
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold text-white flex-shrink-0 border"
+                              style={{ background:`${pl.color}22`, borderColor:pl.color }}>
                               {(m.fname?.[0]||'')+(m.lname?.[0]||'')}
                             </div>
                             <div>
-                              <div className="font-bold text-white tracking-wide">{m.fname} {m.lname}</div>
-                              <div className="text-xs text-zinc-500 font-mono mt-0.5">{m.phone}</div>
+                              <div className="font-bold text-white text-base">{m.fname} {m.lname}</div>
+                              <div className="text-xs text-zinc-400 mt-0.5">{m.phone} · {m.email}</div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-5 py-4"><Badge label={m.plan} /></td>
-                        <td className="px-5 py-4"><Badge label={m.role} /></td>
-                        <td className="px-5 py-4"><Badge label={m.status} /></td>
-                        <td className="px-5 py-4">
+                        <td className="px-6 py-4"><Badge label={m.plan} /></td>
+                        <td className="px-6 py-4"><Badge label={m.role} /></td>
+                        <td className="px-6 py-4"><Badge label={m.status} /></td>
+                        <td className="px-6 py-4">
                           <Badge label={m.paidThisMonth ? 'PAID' : 'DUE'} />
                         </td>
-                        <td className="px-5 py-4">
+                        <td className="px-6 py-4">
                           <div className="flex gap-2 flex-wrap items-center">
                             <Btn size="sm" variant="ghost" onClick={()=>openEdit(m)}>✏️ Edit</Btn>
                             {m.status === 'PENDING' && (
-                              <Btn size="sm" variant="primary" onClick={()=>approve(m._id, m.fname)}>⚡ Approve</Btn>
+                              <Btn size="sm" variant="primary" onClick={()=>approve(m._id, m.fname)}>Approve</Btn>
                             )}
                             {!m.paidThisMonth && m.status==='ACTIVE' && (
                               <Btn size="sm" variant="ghost" onClick={()=>openUpi(m)}>💳 UPI Link</Btn>
                             )}
                             <Btn size="sm" variant={m.status==='SUSPENDED'?'green':'red'}
                               onClick={()=>suspend(m._id, m.status, m.fname)}>
-                              {m.status==='SUSPENDED'?'⚡ Restore':'🚫 Suspend'}
+                              {m.status==='SUSPENDED'?'Restore':'Suspend'}
                             </Btn>
-                            {isSuperAdmin && <Btn size="sm" variant="red" onClick={()=>deleteMem(m._id, m.fname)}>🗑️</Btn>}
+                            {isSuperAdmin && <Btn size="sm" variant="red" onClick={()=>deleteMem(m._id, m.fname)}>🗑️ Delete</Btn>}
                           </div>
                         </td>
                       </tr>
@@ -193,59 +192,56 @@ export default function AdminMembersPage() {
 
       {/* Add/Edit Modal */}
       {modalMode && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-[#14141c] border border-white/15 rounded-2xl p-6 w-full max-w-md shadow-[0_0_50px_rgba(0,0,0,0.8)] max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center gap-2 text-[#ff5500] font-sports font-extrabold text-xs uppercase tracking-widest mb-1">
-              ⚡ ROSTER PROFILE FORM
-            </div>
-            <h2 className="text-xl font-extrabold font-sports text-white mb-5">
-              {modalMode === 'ADD' ? '➕ ADD NEW ATHLETE' : '✏️ EDIT ATHLETE DETAILS'}
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-[#131318] border border-zinc-800 rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold text-white mb-5">
+              {modalMode === 'ADD' ? '➕ Add New Member' : '✏️ Edit Member Details'}
             </h2>
             <form onSubmit={handleFormSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-sports font-bold uppercase tracking-widest text-zinc-400 mb-1">First Name</label>
-                  <input required value={form.fname} onChange={e=>setForm({...form, fname: e.target.value})} className="w-full px-3.5 py-2.5 border border-white/15 rounded-xl text-sm bg-[#1a1a24] text-white outline-none focus:border-[#ff5500]" />
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">First Name</label>
+                  <input required value={form.fname} onChange={e=>setForm({...form, fname: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-sports font-bold uppercase tracking-widest text-zinc-400 mb-1">Last Name</label>
-                  <input required value={form.lname} onChange={e=>setForm({...form, lname: e.target.value})} className="w-full px-3.5 py-2.5 border border-white/15 rounded-xl text-sm bg-[#1a1a24] text-white outline-none focus:border-[#ff5500]" />
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Last Name</label>
+                  <input required value={form.lname} onChange={e=>setForm({...form, lname: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
                 </div>
               </div>
               <div>
-                <label className="block text-[11px] font-sports font-bold uppercase tracking-widest text-zinc-400 mb-1">Email</label>
-                <input required type="email" value={form.email} onChange={e=>setForm({...form, email: e.target.value})} className="w-full px-3.5 py-2.5 border border-white/15 rounded-xl text-sm bg-[#1a1a24] text-white outline-none focus:border-[#ff5500]" />
+                <label className="block text-xs font-semibold text-zinc-300 mb-1">Email Address</label>
+                <input required type="email" value={form.email} onChange={e=>setForm({...form, email: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
               </div>
               <div>
-                <label className="block text-[11px] font-sports font-bold uppercase tracking-widest text-zinc-400 mb-1">Phone</label>
-                <input required value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full px-3.5 py-2.5 border border-white/15 rounded-xl text-sm bg-[#1a1a24] text-white outline-none focus:border-[#ff5500]" />
+                <label className="block text-xs font-semibold text-zinc-300 mb-1">Phone Number</label>
+                <input required value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
               </div>
               <div>
-                <label className="block text-[11px] font-sports font-bold uppercase tracking-widest text-zinc-400 mb-1">City / Location</label>
-                <input value={form.city} onChange={e=>setForm({...form, city: e.target.value})} className="w-full px-3.5 py-2.5 border border-white/15 rounded-xl text-sm bg-[#1a1a24] text-white outline-none focus:border-[#ff5500]" />
+                <label className="block text-xs font-semibold text-zinc-300 mb-1">City / Location</label>
+                <input value={form.city} onChange={e=>setForm({...form, city: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-sports font-bold uppercase tracking-widest text-zinc-400 mb-1">Division</label>
-                  <select value={form.plan} onChange={e=>setForm({...form, plan: e.target.value})} className="w-full px-3.5 py-2.5 border border-white/15 rounded-xl text-sm bg-[#1a1a24] text-white font-bold">
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Plan</label>
+                  <select value={form.plan} onChange={e=>setForm({...form, plan: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white font-semibold">
                     <option value="SILVER">Silver (₹300)</option>
                     <option value="GOLD">Gold (₹500)</option>
                     <option value="PLATINUM">Platinum (₹1000)</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-sports font-bold uppercase tracking-widest text-zinc-400 mb-1">Role</label>
-                  <select value={form.role} onChange={e=>setForm({...form, role: e.target.value})} className="w-full px-3.5 py-2.5 border border-white/15 rounded-xl text-sm bg-[#1a1a24] text-white font-bold">
-                    <option value="MEMBER">Athlete</option>
-                    <option value="PANEL">Committee</option>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Role</label>
+                  <select value={form.role} onChange={e=>setForm({...form, role: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white font-semibold">
+                    <option value="MEMBER">Member</option>
+                    <option value="PANEL">Panel</option>
                     <option value="SUPER_ADMIN">Super Admin</option>
                   </select>
                 </div>
               </div>
               {modalMode === 'EDIT' && (
                 <div>
-                  <label className="block text-[11px] font-sports font-bold uppercase tracking-widest text-zinc-400 mb-1">Status</label>
-                  <select value={form.status} onChange={e=>setForm({...form, status: e.target.value})} className="w-full px-3.5 py-2.5 border border-white/15 rounded-xl text-sm bg-[#1a1a24] text-white font-bold">
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Account Status</label>
+                  <select value={form.status} onChange={e=>setForm({...form, status: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white font-semibold">
                     <option value="ACTIVE">Active</option>
                     <option value="PENDING">Pending</option>
                     <option value="SUSPENDED">Suspended</option>
@@ -254,13 +250,13 @@ export default function AdminMembersPage() {
               )}
               {modalMode === 'ADD' && (
                 <div>
-                  <label className="block text-[11px] font-sports font-bold uppercase tracking-widest text-zinc-400 mb-1">Initial Password</label>
-                  <input value={form.password} onChange={e=>setForm({...form, password: e.target.value})} placeholder="Default: demo123" className="w-full px-3.5 py-2.5 border border-white/15 rounded-xl text-sm bg-[#1a1a24] text-white outline-none focus:border-[#ff5500]" />
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Initial Password</label>
+                  <input value={form.password} onChange={e=>setForm({...form, password: e.target.value})} placeholder="Default: demo123" className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
                 </div>
               )}
-              <div className="flex justify-end gap-3 pt-4 border-t border-white/10 mt-6">
+              <div className="flex justify-end gap-3 pt-4 border-t border-zinc-800 mt-6">
                 <Btn variant="ghost" onClick={()=>setModalMode(null)}>Cancel</Btn>
-                <Btn variant="primary" type="submit">{modalMode === 'ADD' ? '⚡ Add Athlete' : '⚡ Save Changes'}</Btn>
+                <Btn variant="primary" type="submit">{modalMode === 'ADD' ? 'Add Member' : 'Save Changes'}</Btn>
               </div>
             </form>
           </div>
