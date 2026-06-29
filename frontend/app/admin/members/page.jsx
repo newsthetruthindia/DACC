@@ -276,6 +276,7 @@ export default function AdminMembersPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-zinc-300 mb-1">Role</label>
+                  <select value={form.role} onChange={e=>setForm({...form, role: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white font-semibold">
                     <option value="MEMBER">Member</option>
                     <option value="ACCOUNTANT">Accountant</option>
                     <option value="PANEL">Panel</option>
