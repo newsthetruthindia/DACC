@@ -9,12 +9,23 @@ const UserSchema = new Schema({
   phone:        { type: String, required: true, unique: true, trim: true },
   passwordHash: { type: String, required: true },
   avatarUrl:    { type: String, default: null },
+  selfieUrl:    { type: String, default: null },
+  memberId:     { type: String, unique: true, sparse: true },
+  aadhaar:      { type: String, default: '' },
   city:         { type: String, default: '' },
   plan:         { type: String, enum: ['SILVER', 'GOLD', 'PLATINUM'], default: 'SILVER' },
   role:         { type: String, enum: ['MEMBER', 'PANEL', 'SUPER_ADMIN'], default: 'MEMBER' },
   status:       { type: String, enum: ['PENDING', 'ACTIVE', 'SUSPENDED', 'INACTIVE'], default: 'PENDING' },
   joinedAt:     { type: Date, default: Date.now },
 }, { timestamps: true });
+
+UserSchema.pre('save', async function(next) {
+  if (!this.memberId) {
+    const num = Math.floor(100000 + Math.random() * 900000);
+    this.memberId = `AGC-${num}`;
+  }
+  next();
+});
 
 // ── ClubTerm ──────────────────────────────────────────────────
 const ClubTermSchema = new Schema({

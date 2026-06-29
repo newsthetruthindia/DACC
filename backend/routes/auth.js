@@ -8,16 +8,18 @@ const { PLANS, buildUpiLink, currentMonth } = require('../lib/plans');
 // ── POST /auth/register ───────────────────────────────────────
 router.post('/register', async (req, res) => {
   try {
-    const { fname, lname, email, phone, password, city, plan = 'SILVER' } = req.body;
-    if (!fname || !lname || !email || !phone || !password)
-      return res.status(400).json({ success: false, error: 'All fields required' });
+    const { fname, lname, email, phone, password, city, plan = 'SILVER', aadhaar, selfieUrl } = req.body;
+    if (!fname || !lname || !email || !phone || !password || !aadhaar)
+      return res.status(400).json({ success: false, error: 'All fields including Aadhaar number are required' });
+    if (!/^\d{12}$/.test(aadhaar.trim()))
+      return res.status(400).json({ success: false, error: 'Aadhaar number must be exactly 12 digits' });
     if (!PLANS[plan])
       return res.status(400).json({ success: false, error: 'Invalid plan' });
-    if (await User.findOne({ $or: [{ email }, { phone }] }))
-      return res.status(409).json({ success: false, error: 'Email or phone already registered' });
+    if (await User.findOne({ $or: [{ email }, { phone }, { aadhaar: aadhaar.trim() }] }))
+      return res.status(409).json({ success: false, error: 'Email, phone, or Aadhaar already registered' });
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = await User.create({ fname, lname, email, phone, passwordHash, city, plan, status: 'PENDING' });
+    const user = await User.create({ fname, lname, email, phone, passwordHash, city, plan, status: 'PENDING', aadhaar: aadhaar.trim(), selfieUrl: selfieUrl || null });
 
     const month = currentMonth();
     const upiLink = buildUpiLink(plan, month);
@@ -52,6 +54,12 @@ router.post('/login', async (req, res) => {
     if (!user || !(await bcrypt.compare(password, user.passwordHash)))
       return res.status(401).json({ success: false, error: 'Invalid credentials' });
 
+    if (!user.memberId) {
+      const num = Math.floor(100000 + Math.random() * 900000);
+      user.memberId = `AGC-${num}`;
+      await user.save();
+    }
+
     res.json({
       success: true,
       data: {
@@ -60,7 +68,8 @@ router.post('/login', async (req, res) => {
           id: user._id, fname: user.fname, lname: user.lname,
           email: user.email, phone: user.phone,
           plan: user.plan, role: user.role, status: user.status,
-          avatarUrl: user.avatarUrl, city: user.city,
+          avatarUrl: user.avatarUrl, selfieUrl: user.selfieUrl,
+          memberId: user.memberId, aadhaar: user.aadhaar, city: user.city,
         }
       }
     });

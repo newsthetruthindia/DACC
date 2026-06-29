@@ -16,6 +16,12 @@ router.get('/me', protect, async (req, res) => {
     const daysDiff = (Date.now() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
     const isOverdue = req.user.role !== 'SUPER_ADMIN' && daysDiff > 30 && !paidThisMonth;
 
+    if (!req.user.memberId) {
+      const num = Math.floor(100000 + Math.random() * 900000);
+      req.user.memberId = `AGC-${num}`;
+      await req.user.save();
+    }
+
     res.json({
       success: true,
       data: { ...req.user.toObject(), payments: payments.slice(0, 12), paidThisMonth, isOverdue, daysDiff: Math.floor(daysDiff) }
@@ -28,7 +34,7 @@ router.get('/me', protect, async (req, res) => {
 // ── PATCH /members/me ─────────────────────────────────────────
 router.patch('/me', protect, async (req, res) => {
   try {
-    const allowed = ['fname', 'lname', 'city', 'phone'];
+    const allowed = ['fname', 'lname', 'city', 'phone', 'aadhaar', 'selfieUrl'];
     const updates = {};
     allowed.forEach(k => { if (req.body[k] !== undefined) updates[k] = req.body[k]; });
     const user = await User.findByIdAndUpdate(req.user._id, updates, { new: true }).select('-passwordHash');
@@ -111,12 +117,12 @@ router.patch('/:id/suspend', protect, restrictTo('SUPER_ADMIN'), async (req, res
 // ── POST /members (Admin create member) ───────────────────────
 router.post('/', protect, restrictTo('SUPER_ADMIN', 'PANEL'), async (req, res) => {
   try {
-    const { fname, lname, email, phone, plan, role, city, password } = req.body;
+    const { fname, lname, email, phone, plan, role, city, password, aadhaar, selfieUrl } = req.body;
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ success: false, error: 'Email already exists' });
     
     const user = await User.create({
-      fname, lname, email, phone, plan: plan || 'SILVER', role: role || 'MEMBER', city: city || '', status: 'ACTIVE', passwordHash: password || 'demo123'
+      fname, lname, email, phone, plan: plan || 'SILVER', role: role || 'MEMBER', city: city || '', status: 'ACTIVE', passwordHash: password || 'demo123', aadhaar: aadhaar || '', selfieUrl: selfieUrl || null
     });
     res.json({ success: true, data: user });
   } catch (err) {
@@ -127,7 +133,7 @@ router.post('/', protect, restrictTo('SUPER_ADMIN', 'PANEL'), async (req, res) =
 // ── PATCH /members/:id (Admin edit member) ────────────────────
 router.patch('/:id', protect, restrictTo('SUPER_ADMIN', 'PANEL'), async (req, res) => {
   try {
-    const allowed = ['fname', 'lname', 'email', 'phone', 'plan', 'role', 'status', 'city'];
+    const allowed = ['fname', 'lname', 'email', 'phone', 'plan', 'role', 'status', 'city', 'aadhaar', 'selfieUrl'];
     const updates = {};
     allowed.forEach(k => { if (req.body[k] !== undefined) updates[k] = req.body[k]; });
     const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true }).select('-passwordHash');

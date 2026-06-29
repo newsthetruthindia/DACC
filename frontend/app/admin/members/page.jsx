@@ -14,7 +14,7 @@ export default function AdminMembersPage() {
   const [loading, setLoading] = useState(true);
   const [modalMode, setModalMode] = useState(null);
   const [activeMember, setActiveMember] = useState(null);
-  const [form, setForm] = useState({ fname: '', lname: '', email: '', phone: '', plan: 'SILVER', role: 'MEMBER', status: 'ACTIVE', city: '', password: '' });
+  const [form, setForm] = useState({ fname: '', lname: '', email: '', phone: '', plan: 'SILVER', role: 'MEMBER', status: 'ACTIVE', city: '', password: '', aadhaar: '', selfieUrl: '' });
 
   const currentUser = getUser();
   const isSuperAdmin = currentUser?.role === 'SUPER_ADMIN';
@@ -32,6 +32,20 @@ export default function AdminMembersPage() {
   };
 
   useEffect(() => { load(); }, [search, filterStatus, filterPlan]);
+
+  const handleSelfieChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast('Selfie image must be under 5 MB', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setForm(f => ({ ...f, selfieUrl: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  };
 
   const approve = async (id, name) => {
     await api.approveMember(id);
@@ -54,14 +68,14 @@ export default function AdminMembersPage() {
   };
 
   const openAdd = () => {
-    setForm({ fname: '', lname: '', email: '', phone: '', plan: 'SILVER', role: 'MEMBER', status: 'ACTIVE', city: '', password: 'demo123' });
+    setForm({ fname: '', lname: '', email: '', phone: '', plan: 'SILVER', role: 'MEMBER', status: 'ACTIVE', city: '', password: 'demo123', aadhaar: '', selfieUrl: '' });
     setActiveMember(null);
     setModalMode('ADD');
   };
 
   const openEdit = (m) => {
     setActiveMember(m);
-    setForm({ fname: m.fname, lname: m.lname, email: m.email, phone: m.phone, plan: m.plan, role: m.role, status: m.status, city: m.city || '' });
+    setForm({ fname: m.fname, lname: m.lname, email: m.email, phone: m.phone, plan: m.plan, role: m.role, status: m.status, city: m.city || '', aadhaar: m.aadhaar || '', selfieUrl: m.selfieUrl || m.avatarUrl || '' });
     setModalMode('EDIT');
   };
 
@@ -106,14 +120,14 @@ export default function AdminMembersPage() {
       <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
         <div>
           <h1 className="text-2xl lg:text-3xl font-extrabold text-white">🗂️ Manage Club Members</h1>
-          <p className="text-sm text-zinc-400 mt-1">{total} total registered members in portal database</p>
+          <p className="text-sm text-zinc-400 mt-1">{total} total registered members with Unique IDs & KYC</p>
         </div>
         {isSuperAdmin && <Btn variant="primary" onClick={openAdd}>➕ Add New Member</Btn>}
       </div>
 
       {/* Filters */}
       <div className="flex gap-4 mb-6 flex-wrap">
-        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 Search by name, email, or phone…"
+        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 Search by name, email, phone, or Aadhaar…"
           className="flex-1 min-w-[240px] px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500 placeholder:text-zinc-500" />
         <select value={filterStatus} onChange={e=>setFS(e.target.value)}
           className="px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white font-semibold outline-none focus:border-orange-500">
@@ -129,35 +143,45 @@ export default function AdminMembersPage() {
 
       <Card className="overflow-hidden">
         <CardHeader>
-          <span className="font-bold text-white text-base">Registered Members Roster</span>
+          <span className="font-bold text-white text-base">Registered Members & KYC Roster</span>
         </CardHeader>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-zinc-900/80 text-zinc-400 font-bold text-xs uppercase tracking-wider border-b border-zinc-800">
-                {['Member Details','Plan','Role','Status','This Month','Actions'].map(h=>(
+                {['Member Athlete & ID','KYC / Aadhaar','Plan','Role','Status','This Month','Actions'].map(h=>(
                   <th key={h} className="text-left px-6 py-4">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/80">
               {members.length === 0
-                ? <tr><td colSpan={6}><Empty icon="🔍" title="No matching members found" /></td></tr>
+                ? <tr><td colSpan={7}><Empty icon="🔍" title="No matching members found" /></td></tr>
                 : members.map(m => {
                     const pl = PLANS[m.plan] || PLANS.SILVER;
                     return (
                       <tr key={m._id} className="hover:bg-zinc-900/40 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold text-white flex-shrink-0 border"
-                              style={{ background:`${pl.color}22`, borderColor:pl.color }}>
-                              {(m.fname?.[0]||'')+(m.lname?.[0]||'')}
+                            <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center text-xs font-bold text-white flex-shrink-0 border bg-zinc-800 relative shadow"
+                              style={{ borderColor:pl.color }}>
+                              {m.selfieUrl || m.avatarUrl ? (
+                                <img src={m.selfieUrl || m.avatarUrl} alt={m.fname} className="w-full h-full object-cover" />
+                              ) : (
+                                <span>{(m.fname?.[0]||'')+(m.lname?.[0]||'')}</span>
+                              )}
                             </div>
                             <div>
-                              <div className="font-bold text-white text-base">{m.fname} {m.lname}</div>
+                              <div className="font-bold text-white text-base flex items-center gap-2">
+                                <span>{m.fname} {m.lname}</span>
+                                <span className="text-[11px] font-mono font-extrabold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20">{m.memberId || 'AGC-GEN'}</span>
+                              </div>
                               <div className="text-xs text-zinc-400 mt-0.5">{m.phone} · {m.email}</div>
                             </div>
                           </div>
+                        </td>
+                        <td className="px-6 py-4 font-mono text-xs text-zinc-300">
+                          {m.aadhaar ? `•••• ${m.aadhaar.slice(-4)}` : <span className="text-zinc-500 italic">No Aadhaar</span>}
                         </td>
                         <td className="px-6 py-4"><Badge label={m.plan} /></td>
                         <td className="px-6 py-4"><Badge label={m.role} /></td>
@@ -178,7 +202,7 @@ export default function AdminMembersPage() {
                               onClick={()=>suspend(m._id, m.status, m.fname)}>
                               {m.status==='SUSPENDED'?'Restore':'Suspend'}
                             </Btn>
-                            {isSuperAdmin && <Btn size="sm" variant="red" onClick={()=>deleteMem(m._id, m.fname)}>🗑️ Delete</Btn>}
+                            {isSuperAdmin && <Btn size="sm" variant="red" onClick={()=>deleteMem(m._id, m.fname)}>🗑️</Btn>}
                           </div>
                         </td>
                       </tr>
@@ -195,9 +219,24 @@ export default function AdminMembersPage() {
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-[#131318] border border-zinc-800 rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold text-white mb-5">
-              {modalMode === 'ADD' ? '➕ Add New Member' : '✏️ Edit Member Details'}
+              {modalMode === 'ADD' ? '➕ Add New Member' : '✏️ Edit Member & KYC Details'}
             </h2>
             <form onSubmit={handleFormSubmit} className="space-y-4">
+              
+              {/* Selfie Upload */}
+              <div className="p-3 bg-zinc-900/60 border border-zinc-800 rounded-xl flex items-center gap-3">
+                <div className="w-14 h-14 rounded-xl bg-zinc-800 overflow-hidden flex items-center justify-center flex-shrink-0 border border-zinc-700">
+                  {form.selfieUrl ? <img src={form.selfieUrl} alt="Selfie" className="w-full h-full object-cover" /> : <span>📷</span>}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-bold text-white">Member Selfie Photo</div>
+                  <label className="mt-1 px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-lg border border-zinc-600 cursor-pointer inline-block">
+                    <span>{form.selfieUrl ? 'Change Selfie' : 'Upload Selfie'}</span>
+                    <input type="file" accept="image/*" capture="user" onChange={handleSelfieChange} className="hidden" />
+                  </label>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-zinc-300 mb-1">First Name</label>
@@ -209,16 +248,22 @@ export default function AdminMembersPage() {
                 </div>
               </div>
               <div>
+                <label className="block text-xs font-semibold text-zinc-300 mb-1">Aadhaar Card Number (12 Digits)</label>
+                <input value={form.aadhaar} onChange={e=>setForm({...form, aadhaar: e.target.value})} maxLength={12} placeholder="12-digit Aadhaar number" className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white font-mono outline-none focus:border-orange-500" />
+              </div>
+              <div>
                 <label className="block text-xs font-semibold text-zinc-300 mb-1">Email Address</label>
                 <input required type="email" value={form.email} onChange={e=>setForm({...form, email: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-zinc-300 mb-1">Phone Number</label>
-                <input required value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-zinc-300 mb-1">City / Location</label>
-                <input value={form.city} onChange={e=>setForm({...form, city: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Phone Number</label>
+                  <input required value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1">City / Location</label>
+                  <input value={form.city} onChange={e=>setForm({...form, city: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
