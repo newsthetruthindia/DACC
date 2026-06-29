@@ -65,7 +65,7 @@ router.post('/submit', protect, upload.single('screenshot'), async (req, res) =>
 });
 
 // ── POST /payments/confirm ────────────────────────────────────
-router.post('/confirm', protect, restrictTo('PANEL', 'SUPER_ADMIN'), async (req, res) => {
+router.post('/confirm', protect, restrictTo('PANEL', 'SUPER_ADMIN', 'ACCOUNTANT'), async (req, res) => {
   try {
     const { paymentId } = req.body;
     const payment = await Payment.findByIdAndUpdate(
@@ -87,7 +87,7 @@ router.post('/confirm', protect, restrictTo('PANEL', 'SUPER_ADMIN'), async (req,
 });
 
 // ── GET /payments/pending ─────────────────────────────────────
-router.get('/pending', protect, restrictTo('PANEL', 'SUPER_ADMIN'), async (req, res) => {
+router.get('/pending', protect, restrictTo('PANEL', 'SUPER_ADMIN', 'ACCOUNTANT'), async (req, res) => {
   try {
     const payments = await Payment.find({ status: 'PENDING' })
       .populate('userId', 'fname lname email phone plan')
@@ -99,7 +99,7 @@ router.get('/pending', protect, restrictTo('PANEL', 'SUPER_ADMIN'), async (req, 
 });
 
 // ── GET /payments/dues-summary ────────────────────────────────
-router.get('/dues-summary', protect, restrictTo('PANEL', 'SUPER_ADMIN'), async (req, res) => {
+router.get('/dues-summary', protect, restrictTo('PANEL', 'SUPER_ADMIN', 'ACCOUNTANT'), async (req, res) => {
   try {
     const month = req.query.month || currentMonth();
     const allMembers = await User.find({ status: 'ACTIVE' });
@@ -142,7 +142,7 @@ router.get('/dues-summary', protect, restrictTo('PANEL', 'SUPER_ADMIN'), async (
 
 // ── POST /payments/send-reminders ─────────────────────────────
 // Admin triggers email reminders to all members who haven't paid
-router.post('/send-reminders', protect, restrictTo('SUPER_ADMIN', 'PANEL'), async (req, res) => {
+router.post('/send-reminders', protect, restrictTo('SUPER_ADMIN', 'PANEL', 'ACCOUNTANT'), async (req, res) => {
   try {
     const month = req.body.month || currentMonth();
     const confirmed = await Payment.find({ forMonth: month, status: 'CONFIRMED' });

@@ -45,7 +45,7 @@ router.patch('/me', protect, async (req, res) => {
 });
 
 // ── GET /members (Admin only) ─────────────────────────────────
-router.get('/', protect, restrictTo('SUPER_ADMIN', 'PANEL'), async (req, res) => {
+router.get('/', protect, restrictTo('SUPER_ADMIN', 'PANEL', 'ACCOUNTANT'), async (req, res) => {
   try {
     const { status, plan, search, page = 1, limit = 20 } = req.query;
     const filter = {};
@@ -115,7 +115,7 @@ router.patch('/:id/suspend', protect, restrictTo('SUPER_ADMIN'), async (req, res
 });
 
 // ── POST /members (Admin create member) ───────────────────────
-router.post('/', protect, restrictTo('SUPER_ADMIN', 'PANEL'), async (req, res) => {
+router.post('/', protect, restrictTo('SUPER_ADMIN', 'PANEL', 'ACCOUNTANT'), async (req, res) => {
   try {
     const { fname, lname, email, phone, plan, role, city, password, aadhaar, selfieUrl } = req.body;
     const exists = await User.findOne({ email });
@@ -131,7 +131,7 @@ router.post('/', protect, restrictTo('SUPER_ADMIN', 'PANEL'), async (req, res) =
 });
 
 // ── PATCH /members/:id (Admin edit member) ────────────────────
-router.patch('/:id', protect, restrictTo('SUPER_ADMIN', 'PANEL'), async (req, res) => {
+router.patch('/:id', protect, restrictTo('SUPER_ADMIN', 'PANEL', 'ACCOUNTANT'), async (req, res) => {
   try {
     const allowed = ['fname', 'lname', 'email', 'phone', 'plan', 'role', 'status', 'city', 'aadhaar', 'selfieUrl'];
     const updates = {};

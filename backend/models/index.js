@@ -14,7 +14,7 @@ const UserSchema = new Schema({
   aadhaar:      { type: String, default: '' },
   city:         { type: String, default: '' },
   plan:         { type: String, enum: ['SILVER', 'GOLD', 'PLATINUM'], default: 'SILVER' },
-  role:         { type: String, enum: ['MEMBER', 'PANEL', 'SUPER_ADMIN'], default: 'MEMBER' },
+  role:         { type: String, enum: ['MEMBER', 'PANEL', 'ACCOUNTANT', 'SUPER_ADMIN'], default: 'MEMBER' },
   status:       { type: String, enum: ['PENDING', 'ACTIVE', 'SUSPENDED', 'INACTIVE'], default: 'PENDING' },
   joinedAt:     { type: Date, default: Date.now },
 }, { timestamps: true });

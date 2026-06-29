@@ -79,6 +79,8 @@ export const api = {
 
   // Transparent Ledger / Funds
   getFunds:       ()     => request('GET',  '/funds'),
+  getFundsRoster: (m)    => request('GET',  `/funds/roster?month=${m||''}`),
+  logOfflinePay:  (b)    => request('POST', '/funds/offline-pay', b),
   createFundTx:   (b)    => request('POST', '/funds', b),
   deleteFundTx:   (id)   => request('DELETE',`/funds/${id}`),
 };
