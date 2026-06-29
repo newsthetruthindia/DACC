@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { Notification } = require('../models');
 const { protect, restrictTo } = require('../middleware/auth');
+const { sendGroupAlert } = require('../lib/telegram');
 
 const getTargets = (user) => {
   const targets = ['ALL'];
@@ -57,6 +58,9 @@ router.post('/', protect, restrictTo('PANEL', 'SUPER_ADMIN'), async (req, res) =
     if (!title || !body) return res.status(400).json({ success: false, error: 'Title and body required' });
     const notif = await Notification.create({ fromId: req.user._id, target, title, body, readBy: [req.user._id] });
     const populated = await notif.populate('fromId', 'fname lname');
+
+    sendGroupAlert(`📣 <b>Club Announcement</b> [Target: ${target}]\n\n<b>${title}</b>\n\n${body}\n\n— <i>${req.user.fname} (Committee)</i>`).catch(console.error);
+
     res.status(201).json({ success: true, data: populated });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

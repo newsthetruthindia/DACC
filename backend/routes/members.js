@@ -34,7 +34,7 @@ router.get('/me', protect, async (req, res) => {
 // ── PATCH /members/me ─────────────────────────────────────────
 router.patch('/me', protect, async (req, res) => {
   try {
-    const allowed = ['fname', 'lname', 'city', 'phone', 'aadhaar', 'selfieUrl'];
+    const allowed = ['fname', 'lname', 'city', 'phone', 'aadhaar', 'selfieUrl', 'telegramChatId', 'telegramUsername'];
     const updates = {};
     allowed.forEach(k => { if (req.body[k] !== undefined) updates[k] = req.body[k]; });
     const user = await User.findByIdAndUpdate(req.user._id, updates, { new: true }).select('-passwordHash');
@@ -133,7 +133,7 @@ router.post('/', protect, restrictTo('SUPER_ADMIN', 'PANEL', 'ACCOUNTANT'), asyn
 // ── PATCH /members/:id (Admin edit member) ────────────────────
 router.patch('/:id', protect, restrictTo('SUPER_ADMIN', 'PANEL', 'ACCOUNTANT'), async (req, res) => {
   try {
-    const allowed = ['fname', 'lname', 'email', 'phone', 'plan', 'role', 'status', 'city', 'aadhaar', 'selfieUrl'];
+    const allowed = ['fname', 'lname', 'email', 'phone', 'plan', 'role', 'status', 'city', 'aadhaar', 'selfieUrl', 'telegramChatId', 'telegramUsername'];
     const updates = {};
     allowed.forEach(k => { if (req.body[k] !== undefined) updates[k] = req.body[k]; });
     const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true }).select('-passwordHash');

@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { FundTransaction, Payment, User } = require('../models');
 const { protect, restrictTo } = require('../middleware/auth');
 const { currentMonth, PLANS } = require('../lib/plans');
+const { notifyPaymentConfirmed, sendGroupAlert } = require('../lib/telegram');
 
 // ── GET /funds/roster (Public member dues roster for all members) ──
 router.get('/roster', protect, async (req, res) => {
@@ -98,6 +99,7 @@ router.post('/offline-pay', protect, restrictTo('SUPER_ADMIN', 'PANEL', 'ACCOUNT
       await user.save();
     }
 
+    notifyPaymentConfirmed(user, amount, targetMonth, true).catch(console.error);
     res.json({ success: true, message: `Offline dues recorded for ${user.fname} ${user.lname}` });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -120,6 +122,10 @@ router.post('/', protect, restrictTo('SUPER_ADMIN', 'PANEL', 'ACCOUNTANT'), asyn
       addedBy: req.user._id
     });
     await tx.populate('addedBy', 'fname lname role');
+
+    const icon = type === 'INCOME' ? '🟢' : '🔴';
+    sendGroupAlert(`${icon} <b>New Club ${type === 'INCOME' ? 'Receipt' : 'Cost'} Logged</b>\n\n<b>Item:</b> ${title} (${tx.category})\n<b>Amount:</b> ₹${Number(amount).toLocaleString()}\n<b>Logged By:</b> ${req.user.fname} (${req.user.role||'Committee'})\n\n<i>Transparent Ledger</i>`).catch(console.error);
+
     res.status(201).json({ success: true, data: tx });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

@@ -15,7 +15,7 @@ export default function ProfilePage() {
   useEffect(() => {
     api.myProfile().then(r => {
       setUser(r.data);
-      setForm({ fname:r.data.fname, lname:r.data.lname, city:r.data.city||'', phone:r.data.phone, aadhaar:r.data.aadhaar||'', selfieUrl:r.data.selfieUrl||'' });
+      setForm({ fname:r.data.fname, lname:r.data.lname, city:r.data.city||'', phone:r.data.phone, aadhaar:r.data.aadhaar||'', selfieUrl:r.data.selfieUrl||'', telegramChatId:r.data.telegramChatId||'', telegramUsername:r.data.telegramUsername||'' });
     }).finally(()=>setLoading(false));
   }, []);
 
@@ -97,6 +97,10 @@ export default function ProfilePage() {
                 <span className="font-mono font-bold text-white tracking-wider">{user.aadhaar ? `•••• •••• ${user.aadhaar.slice(-4)}` : 'Not Linked'}</span>
               </div>
               <div className="flex justify-between items-center">
+                <span className="text-zinc-400 font-medium">Telegram Alert ID</span>
+                <span className="font-mono font-bold text-emerald-400">{user.telegramChatId || 'Not Connected'}</span>
+              </div>
+              <div className="flex justify-between items-center">
                 <span className="text-zinc-400 font-medium">Committee Role</span>
                 <span className="font-semibold text-white">{user.role}</span>
               </div>
@@ -142,7 +146,10 @@ export default function ProfilePage() {
                 <Input label="Phone Number" value={form.phone} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} />
                 <Input label="Aadhaar Card Number (12 Digits)" value={form.aadhaar} onChange={e=>setForm(f=>({...f,aadhaar:e.target.value}))} maxLength={12} placeholder="12-digit Aadhaar" />
               </div>
-              <Input label="City / Location"  value={form.city}  onChange={e=>setForm(f=>({...f,city:e.target.value}))} />
+              <div className="grid grid-cols-2 gap-3">
+                <Input label="City / Location"  value={form.city}  onChange={e=>setForm(f=>({...f,city:e.target.value}))} />
+                <Input label="Telegram Chat ID / Phone" value={form.telegramChatId} onChange={e=>setForm(f=>({...f,telegramChatId:e.target.value}))} placeholder="e.g. 123456789 or @handle" />
+              </div>
               
               <div className="pt-2">
                 <Btn onClick={save} disabled={saving}>{saving?'Saving Details…':'Save Profile Changes →'}</Btn>

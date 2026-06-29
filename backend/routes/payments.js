@@ -5,6 +5,7 @@ const { Payment, User, ClubTerm } = require('../models');
 const { protect, restrictTo } = require('../middleware/auth');
 const { PLANS, buildUpiLink, currentMonth } = require('../lib/plans');
 const { sendPaymentConfirmed, sendPaymentReminder } = require('../lib/email');
+const { notifyPaymentConfirmed } = require('../lib/telegram');
 
 // Multer config for payment screenshots
 const storage = multer.diskStorage({
@@ -72,13 +73,14 @@ router.post('/confirm', protect, restrictTo('PANEL', 'SUPER_ADMIN', 'ACCOUNTANT'
       paymentId,
       { status: 'CONFIRMED', confirmedBy: req.user._id, confirmedAt: new Date() },
       { new: true }
-    ).populate('userId', 'fname email plan');
+    ).populate('userId', 'fname lname email plan memberId telegramChatId');
 
     if (!payment) return res.status(404).json({ success: false, error: 'Payment not found' });
 
-    // Send confirmation email
+    // Send confirmation email & telegram alert
     const u = payment.userId;
     sendPaymentConfirmed(u.email, u.fname, payment.forMonth, payment.amount).catch(console.error);
+    notifyPaymentConfirmed(u, payment.amount, payment.forMonth, false).catch(console.error);
 
     res.json({ success: true, data: payment });
   } catch (err) {
