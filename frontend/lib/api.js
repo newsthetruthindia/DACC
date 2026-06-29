@@ -119,3 +119,39 @@ export const clearAuth = () => {
   localStorage.removeItem('ac_token');
   localStorage.removeItem('ac_user');
 };
+
+export const resolveImgUrl = (url) => {
+  if (!url) return null;
+  if (url.startsWith('data:') || url.startsWith('http://') || url.startsWith('https://')) return url;
+  const base = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1').replace('/api/v1', '');
+  const clean = url.startsWith('/') ? url : `/${url}`;
+  return `${base}${clean}`;
+};
+
+export const compressImage = (file, maxWidth = 600, quality = 0.8) => {
+  return new Promise((resolve, reject) => {
+    if (!file) return reject(new Error('No file selected'));
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+};

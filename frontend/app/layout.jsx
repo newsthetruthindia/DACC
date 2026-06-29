@@ -6,6 +6,12 @@ export const metadata = {
   description: 'Member management portal for Agnichakra Club',
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">

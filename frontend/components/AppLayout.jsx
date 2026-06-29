@@ -48,9 +48,9 @@ export default function AppLayout({ children }) {
             ? 'bg-orange-500/15 text-white font-semibold border-l-4 border-orange-500 shadow-sm' 
             : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-white border-l-4 border-transparent'
         }`}>
-        <span className="text-lg">{icon}</span>
-        <span className="flex-1">{label}</span>
-        {badge > 0 && <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{badge}</span>}
+        <span className="text-lg flex-shrink-0">{icon}</span>
+        <span className="flex-1 truncate">{label}</span>
+        {badge > 0 && <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">{badge}</span>}
       </Link>
     );
   };
@@ -59,36 +59,38 @@ export default function AppLayout({ children }) {
   const initials = `${user.fname?.[0] || ''}${user.lname?.[0] || ''}`.toUpperCase();
 
   const sidebar = (
-    <aside className={`w-[250px] bg-[#121216] border-r border-zinc-800 flex flex-col h-full ${mobOpen ? 'flex' : 'hidden'} lg:flex`}>
+    <aside className={`w-[260px] bg-[#121216] border-r border-zinc-800 flex flex-col h-full shadow-2xl lg:shadow-none transition-all`}>
       {/* Brand Header */}
-      <div className="px-6 py-6 border-b border-zinc-800 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-xl shadow">
-          🔥
+      <div className="px-5 py-5 border-b border-zinc-800 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-zinc-900 border border-zinc-700/80 p-1 flex items-center justify-center shadow-lg flex-shrink-0 overflow-hidden">
+            <img src="/logo.png" alt="DACC Agnichakra Logo" className="w-full h-full object-contain" />
+          </div>
+          <div className="min-w-0">
+            <div className="text-white font-extrabold text-base leading-tight truncate tracking-tight">DACC Agnichakra</div>
+            <div className="text-[10px] text-orange-400 font-mono font-bold tracking-wider mt-0.5">ESTD 1962</div>
+          </div>
         </div>
-        <div>
-          <div className="text-white font-bold text-base leading-tight">Agnichakra Club</div>
-          <div className="text-zinc-400 text-xs mt-0.5">Member Portal</div>
-        </div>
+        <button onClick={() => setMobOpen(false)} className="lg:hidden text-zinc-400 hover:text-white text-xl p-1">✕</button>
       </div>
 
       {/* User Profile Pill */}
-      <div className="p-3.5 mx-4 my-4 rounded-xl bg-zinc-900/80 border border-zinc-800">
+      <div className="p-3 mx-3.5 my-3.5 rounded-xl bg-zinc-900/80 border border-zinc-800">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold text-white flex-shrink-0 border"
-            style={{ background: `${planColors[user.plan] || '#f97316'}22`, borderColor: planColors[user.plan] || '#f97316' }}>
+            style={{ backgroundColor: planColors[user.plan] || '#555', borderColor: planColors[user.plan] || '#777' }}>
             {initials}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-white text-sm font-semibold truncate">{user.fname} {user.lname}</div>
+            <div className="text-white font-bold text-sm truncate">{user.fname} {user.lname}</div>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span className="text-xs text-zinc-400">{user.plan} Plan</span>
+              <span className="text-[10px] font-mono font-bold text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded border border-orange-500/20">{user.memberId || 'MEMBER'}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <nav className="flex-1 px-4 py-2 overflow-y-auto space-y-1">
+      <nav className="flex-1 px-3.5 py-2 space-y-1 overflow-y-auto">
         <p className="text-xs font-bold uppercase tracking-wider text-zinc-500 px-3 py-2">Main Navigation</p>
         {navItem('/dashboard',     '📊', 'Dashboard')}
         {navItem('/funds',         '💰', 'Funds & Expenses')}
@@ -114,9 +116,13 @@ export default function AppLayout({ children }) {
         </>}
       </nav>
 
-      <div className="p-4 border-t border-zinc-800">
+      <div className="p-3.5 border-t border-zinc-800 space-y-2">
+        <a href="https://www.facebook.com/agnichakraclub" target="_blank" rel="noopener noreferrer"
+          className="w-full px-3 py-2 rounded-xl bg-[#1877F2]/15 hover:bg-[#1877F2]/25 border border-[#1877F2]/30 text-[#4E9AF1] font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm">
+          <span>👍</span> Official Facebook Page ↗
+        </a>
         <button onClick={() => { clearAuth(); router.push('/login'); }}
-          className="w-full px-4 py-2.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-medium text-sm flex items-center justify-center gap-2 transition-all">
+          className="w-full px-4 py-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-medium text-xs flex items-center justify-center gap-2 transition-all">
           <span>🚪</span> Sign Out
         </button>
       </div>
@@ -136,12 +142,12 @@ export default function AppLayout({ children }) {
   };
 
   const overdueLockoutScreen = (
-    <div className="flex-1 flex items-center justify-center p-6 bg-[#0a0a0d] min-h-full">
-      <div className="max-w-md w-full bg-[#131318] rounded-2xl border border-zinc-800 shadow-2xl p-8 text-center animate-fade-in">
+    <div className="flex-1 flex items-center justify-center p-4 sm:p-6 bg-[#0a0a0d] min-h-full">
+      <div className="max-w-md w-full bg-[#131318] rounded-2xl border border-zinc-800 shadow-2xl p-6 sm:p-8 text-center animate-fade-in">
         <div className="w-16 h-16 bg-red-500/10 border border-red-500/30 text-red-400 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-5">
           🔒
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">Membership Recharge Required</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Membership Recharge Required</h2>
         <p className="text-sm text-zinc-400 mb-6 leading-relaxed">
           Your Agnichakra Club monthly contribution is overdue by over 30 days. To maintain active club privileges and unlock portal features, please complete your contribution.
         </p>
@@ -164,39 +170,39 @@ export default function AppLayout({ children }) {
   return (
     <div className="flex h-screen overflow-hidden bg-[#0a0a0d] text-zinc-100">
       {/* Mobile overlay */}
-      {mobOpen && <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-30 lg:hidden" onClick={() => setMobOpen(false)} />}
+      {mobOpen && <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-30 lg:hidden animate-fade-in" onClick={() => setMobOpen(false)} />}
 
       {/* Sidebar — fixed on mobile */}
-      <div className={`${mobOpen ? 'fixed inset-y-0 left-0 z-40' : 'hidden'} lg:relative lg:flex lg:flex-shrink-0`}>
+      <div className={`fixed inset-y-0 left-0 z-40 lg:relative lg:flex lg:flex-shrink-0 transition-transform duration-300 transform ${mobOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         {sidebar}
       </div>
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Topbar */}
-        <header className="h-16 bg-[#121216] border-b border-zinc-800 flex items-center justify-between px-6 flex-shrink-0 z-20">
-          <div className="flex items-center gap-4">
-            <button className="lg:hidden text-xl text-zinc-400 hover:text-white" onClick={() => setMobOpen(v => !v)}>☰</button>
-            <div className="flex items-center gap-3">
-              <span className="font-bold text-white text-lg">Agnichakra Club Portal</span>
-              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Active Club Season
+        <header className="h-16 bg-[#121216] border-b border-zinc-800 flex items-center justify-between px-3.5 sm:px-6 flex-shrink-0 z-20 gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <button className="lg:hidden text-2xl text-zinc-400 hover:text-white p-1 flex-shrink-0 focus:outline-none" onClick={() => setMobOpen(v => !v)}>☰</button>
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <span className="font-bold text-white text-base sm:text-lg truncate">Agnichakra Portal</span>
+              <span className="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex-shrink-0">
+                <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Active Season
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2 text-xs font-semibold text-zinc-400 bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800">
-              <span>📅 Current Month: {month}</span>
+          <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+            <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-zinc-400 bg-zinc-900 px-3 py-1.5 rounded-xl border border-zinc-800">
+              <span>📅 {month}</span>
             </div>
             {unread > 0 && (
-              <Link href="/notifications" className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400 font-semibold text-xs hover:bg-orange-500/20 transition-all">
-                🔔 <span className="bg-orange-500 text-white px-1.5 py-0.2 rounded-full text-[10px]">{unread}</span>
+              <Link href="/notifications" className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400 font-semibold text-xs hover:bg-orange-500/20 transition-all">
+                🔔 <span className="bg-orange-500 text-white px-1.5 py-0.2 rounded-full text-[10px] font-bold">{unread}</span>
               </Link>
             )}
           </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 lg:p-8">
           {isOverdue ? overdueLockoutScreen : children}
         </main>
       </div>

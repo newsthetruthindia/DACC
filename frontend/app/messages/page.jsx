@@ -133,11 +133,11 @@ export default function MessagesPage() {
                     })}
                   </div>
                   {active.status !== 'CLOSED' && (
-                    <div className="p-4 border-t border-zinc-800/80 bg-zinc-900/40 flex gap-3">
+                    <div className="p-4 border-t border-zinc-800/80 bg-zinc-900/40 flex flex-col sm:flex-row gap-3">
                       <textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Type your reply to the committee…"
                         className="flex-1 px-4 py-3 border border-zinc-700 rounded-xl text-sm text-white bg-[#1a1a24] outline-none focus:border-orange-500 resize-none font-medium" rows={2} />
                       <button onClick={sendReply} disabled={sending || !reply}
-                        className="px-6 bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-sm rounded-xl shadow transition-all disabled:opacity-40">
+                        className="w-full sm:w-auto px-6 py-3 bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-sm rounded-xl shadow transition-all disabled:opacity-40">
                         Reply ↵
                       </button>
                     </div>

@@ -30,12 +30,12 @@ export default function AdminSettingsPage() {
 
   const field = (label, key, placeholder) => (
     <div className="mb-4">
-      <label className="block text-xs font-bold uppercase tracking-widest text-[#9a9890] mb-1.5">{label}</label>
+      <label className="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1.5">{label}</label>
       <input
         value={form[key] || ''}
         onChange={e => setForm({ ...form, [key]: e.target.value })}
         placeholder={placeholder}
-        className="w-full px-3.5 py-2.5 border-[1.5px] border-[#e2e0d8] rounded-xl text-sm outline-none focus:border-[#c8410a] bg-white transition-colors"
+        className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm outline-none focus:border-orange-500 bg-[#1a1a22] text-white transition-colors placeholder:text-zinc-500"
       />
     </div>
   );
@@ -44,15 +44,17 @@ export default function AdminSettingsPage() {
 
   return (
     <AppLayout>
-      <div className="mb-6">
-        <h1 className="text-2xl font-extrabold text-[#1a1916] tracking-tight">Bank & UPI Settings</h1>
-        <p className="text-sm text-[#9a9890] mt-1">Configure Club bank account details & UPI QR payment destination</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">🏦 Bank & UPI Settings</h1>
+        <p className="text-xs sm:text-sm text-zinc-400 mt-1">Configure Club bank account details & UPI QR payment destination</p>
       </div>
 
       <div className="max-w-xl">
         <Card>
-          <CardHeader title="Club Payment Details" />
-          <CardBody>
+          <CardHeader>
+            <span className="font-bold text-white text-base">Club Payment Details</span>
+          </CardHeader>
+          <CardBody className="p-4 sm:p-6">
             <form onSubmit={save}>
               {field('Club UPI ID / VPA', 'upiId', 'e.g. agnichakra@okaxis')}
               {field('Bank Name', 'bankName', 'e.g. HDFC Bank')}
@@ -60,8 +62,8 @@ export default function AdminSettingsPage() {
               {field('Account Number', 'accountNo', 'e.g. 50200012345678')}
               {field('IFSC Code', 'ifsc', 'e.g. HDFC0001234')}
 
-              <div className="mt-6 pt-4 border-t border-[#e2e0d8] flex justify-end">
-                <Btn type="submit" variant="primary" disabled={saving}>
+              <div className="mt-6 pt-4 border-t border-zinc-800 flex justify-end">
+                <Btn type="submit" variant="primary" disabled={saving} className="w-full sm:w-auto">
                   {saving ? 'Saving...' : 'Save Settings →'}
                 </Btn>
               </div>

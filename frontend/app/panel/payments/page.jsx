@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import AppLayout from '@/components/AppLayout';
 import { Card, CardHeader, Btn, Loading, Empty, toast, Badge } from '@/components/ui';
-import { api, PLANS, fmtTime, currentMonth } from '@/lib/api';
+import { api, PLANS, fmtTime, currentMonth, resolveImgUrl } from '@/lib/api';
 
 export default function PanelPaymentsPage() {
   const [pending, setPending]   = useState([]);
@@ -94,7 +94,7 @@ export default function PanelPaymentsPage() {
                         <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center text-sm font-bold text-white flex-shrink-0 border bg-zinc-800 shadow"
                           style={{ borderColor: pl.color || '#f97316' }}>
                           {u?.selfieUrl || u?.avatarUrl ? (
-                            <img src={u?.selfieUrl || u?.avatarUrl} alt="" className="w-full h-full object-cover" />
+                            <img src={resolveImgUrl(u?.selfieUrl || u?.avatarUrl)} alt="" className="w-full h-full object-cover" />
                           ) : (
                             <span>{(u?.fname?.[0]||'')+(u?.lname?.[0]||'')}</span>
                           )}

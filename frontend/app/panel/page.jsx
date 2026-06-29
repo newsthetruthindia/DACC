@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import AppLayout from '@/components/AppLayout';
 import { Card, CardBody, Loading, Empty, Btn, toast, Badge } from '@/components/ui';
-import { api, PLANS, getUser } from '@/lib/api';
+import { api, PLANS, getUser, resolveImgUrl } from '@/lib/api';
 
 export default function PanelPage() {
   const [panel, setPanel] = useState([]);
@@ -89,7 +89,7 @@ export default function PanelPage() {
                   <div className="w-24 h-24 rounded-2xl overflow-hidden mb-4 border-2 shadow-lg flex items-center justify-center bg-zinc-800 relative"
                     style={{ borderColor: pl.color || '#f97316' }}>
                     {u?.selfieUrl || u?.avatarUrl ? (
-                      <img src={u?.selfieUrl || u?.avatarUrl} alt={u?.fname} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      <img src={resolveImgUrl(u?.selfieUrl || u?.avatarUrl)} alt={u?.fname} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                     ) : (
                       <span className="text-2xl font-black text-white">{initials}</span>
                     )}

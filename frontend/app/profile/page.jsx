@@ -1,173 +1,168 @@
 'use client';
 import { useEffect, useState } from 'react';
 import AppLayout from '@/components/AppLayout';
-import { Card, CardHeader, CardBody, Btn, Input, Loading, toast, Badge } from '@/components/ui';
-import { api, PLANS, fmtDate, saveAuth, getUser } from '@/lib/api';
+import { Card, CardHeader, CardBody, Btn, Badge, Loading, toast } from '@/components/ui';
+import { api, getUser, saveAuth, compressImage, resolveImgUrl } from '@/lib/api';
 
 export default function ProfilePage() {
-  const [user, setUser]     = useState(null);
-  const [form, setForm]     = useState({ fname:'', lname:'', city:'', phone:'', aadhaar:'', selfieUrl:'' });
-  const [oldPass, setOld]   = useState('');
-  const [newPass, setNew]   = useState('');
-  const [saving, setSaving] = useState(false);
+  const [user, setUser]       = useState(null);
+  const [form, setForm]       = useState({ fname: '', lname: '', phone: '', city: '', selfieUrl: '' });
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving]   = useState(false);
 
-  useEffect(() => {
+  const load = () => {
     api.myProfile().then(r => {
-      setUser(r.data);
-      setForm({ fname:r.data.fname, lname:r.data.lname, city:r.data.city||'', phone:r.data.phone, aadhaar:r.data.aadhaar||'', selfieUrl:r.data.selfieUrl||'', telegramChatId:r.data.telegramChatId||'', telegramUsername:r.data.telegramUsername||'' });
-    }).finally(()=>setLoading(false));
-  }, []);
+      if (r.data) {
+        setUser(r.data);
+        setForm({
+          fname: r.data.fname || '',
+          lname: r.data.lname || '',
+          phone: r.data.phone || '',
+          city: r.data.city || '',
+          selfieUrl: r.data.selfieUrl || r.data.avatarUrl || '',
+        });
+        const token = localStorage.getItem('ac_token');
+        if (token) saveAuth(token, r.data);
+      }
+    }).finally(() => setLoading(false));
+  };
 
-  const handleSelfieChange = (e) => {
+  useEffect(() => { load(); }, []);
+
+  const handleSelfieChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      toast('Selfie image must be under 5 MB', 'error');
-      return;
+    try {
+      const compressed = await compressImage(file, 600, 0.8);
+      setForm(f => ({ ...f, selfieUrl: compressed }));
+    } catch (err) {
+      toast('Failed to read photo', 'error');
     }
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setForm(f => ({ ...f, selfieUrl: reader.result }));
-    };
-    reader.readAsDataURL(file);
   };
 
-  const save = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setSaving(true);
     try {
-      const r = await api.updateProfile(form);
-      const updated = { ...getUser(), ...r.data };
-      saveAuth(localStorage.getItem('ac_token'), updated);
-      setUser(updated);
-      toast('Profile details updated successfully ✓');
-    } catch (err) { toast(err.message,'error'); } finally { setSaving(false); }
+      await api.updateProfile(form);
+      toast('Profile updated successfully ✓');
+      load();
+    } catch (err) {
+      toast(err.message || 'Error updating profile', 'error');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const changePass = async () => {
-    if (!oldPass||!newPass) { toast('Fill both password fields','error'); return; }
-    setSaving(true);
-    try {
-      await api.changePassword({ oldPassword:oldPass, newPassword:newPass });
-      setOld(''); setNew('');
-      toast('Password changed successfully ✓');
-    } catch (err) { toast(err.message,'error'); } finally { setSaving(false); }
-  };
-
-  if (loading) return <AppLayout><Loading /></AppLayout>;
-  if (!user)   return <AppLayout><Loading /></AppLayout>;
-
-  const plan = PLANS[user.plan] || PLANS.SILVER;
-  const initials = `${user.fname?.[0]||''}${user.lname?.[0]||''}`.toUpperCase();
+  if (loading || !user) return <AppLayout><Loading /></AppLayout>;
 
   return (
     <AppLayout>
-      <div className="mb-8">
-        <h1 className="text-2xl lg:text-3xl font-extrabold text-white">👤 Member Identity & Profile</h1>
-        <p className="text-sm text-zinc-400 mt-1">Official Club Athlete Identification & Account Settings</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-white">👤 My Athlete Profile & KYC</h1>
+        <p className="text-xs sm:text-sm text-zinc-400 mt-1">Manage personal contact details and official club identity photo.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Profile Card */}
-        <Card>
-          <CardBody className="text-center p-6">
-            <div className="w-28 h-28 rounded-2xl mx-auto mb-4 overflow-hidden border-2 border-orange-500/50 shadow-xl bg-zinc-800 flex items-center justify-center relative">
-              {form.selfieUrl || user.selfieUrl || user.avatarUrl ? (
-                <img src={form.selfieUrl || user.selfieUrl || user.avatarUrl} alt="Member Selfie" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-4xl font-bold text-white">{initials}</span>
-              )}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
+        {/* Identity Card Preview */}
+        <div className="lg:col-span-5">
+          <Card className="bg-[#131318] border-zinc-800 overflow-hidden shadow-2xl relative">
+            <div className="h-28 bg-gradient-to-r from-orange-600 via-red-600 to-orange-500 relative p-4 flex justify-between items-start">
+              <span className="text-xs font-black uppercase tracking-widest bg-black/40 text-white px-3 py-1 rounded-full border border-white/20">Official Club ID</span>
+              <span className="text-xl">🔥</span>
             </div>
-            <div className="font-extrabold text-xl text-white">{user.fname} {user.lname}</div>
-            <div className="text-xs font-mono text-orange-400 font-bold bg-orange-500/10 border border-orange-500/20 py-1 px-3 rounded-full inline-block mt-2 mb-3">
-              🆔 ID: {user.memberId || 'AGC-GENERATING'}
-            </div>
-            <div className="text-sm text-zinc-400 mb-4">{user.email}</div>
             
-            <div className="flex justify-center gap-2 mb-5">
-              <Badge label={user.plan} />
-              <Badge label={user.status} />
-            </div>
+            <div className="px-6 pb-6 pt-0 relative flex flex-col items-center text-center -mt-14">
+              <div className="w-28 h-28 rounded-2xl bg-zinc-800 border-4 border-[#131318] shadow-2xl overflow-hidden flex items-center justify-center relative mb-4">
+                {form.selfieUrl ? (
+                  <img src={resolveImgUrl(form.selfieUrl)} alt="Selfie" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-3xl">📷</span>
+                )}
+              </div>
 
-            <div className="h-px bg-zinc-800 my-5" />
-            
-            <div className="text-left space-y-3 text-sm">
-              <div className="flex justify-between items-center">
-                <span className="text-zinc-400 font-medium">Aadhaar Number</span>
-                <span className="font-mono font-bold text-white tracking-wider">{user.aadhaar ? `•••• •••• ${user.aadhaar.slice(-4)}` : 'Not Linked'}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-zinc-400 font-medium">Telegram Alert ID</span>
-                <span className="font-mono font-bold text-emerald-400">{user.telegramChatId || 'Not Connected'}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-zinc-400 font-medium">Committee Role</span>
-                <span className="font-semibold text-white">{user.role}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-zinc-400 font-medium">Phone Contact</span>
-                <span className="font-semibold text-white">{user.phone}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-zinc-400 font-medium">City / Area</span>
-                <span className="font-semibold text-white">{user.city || '—'}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-zinc-400 font-medium">Member Since</span>
-                <span className="font-semibold text-white">{fmtDate(user.joinedAt)}</span>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
+              <h2 className="text-xl font-black text-white">{user.fname} {user.lname}</h2>
+              <div className="text-xs font-mono font-extrabold text-orange-400 mt-0.5 bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/20">{user.memberId || 'AGC-MEMBER'}</div>
 
-        <div className="lg:col-span-2 space-y-6">
-          {/* Edit Profile */}
-          <Card>
-            <CardHeader><span className="font-bold text-base text-white">✏️ Update Identity Details</span></CardHeader>
-            <CardBody className="space-y-4">
-              
-              {/* Selfie Update */}
-              <div className="p-4 bg-zinc-900/60 border border-zinc-800 rounded-xl flex items-center justify-between flex-wrap gap-4">
+              <div className="w-full grid grid-cols-2 gap-3 mt-6 pt-6 border-t border-zinc-800/80 text-left">
                 <div>
-                  <div className="text-sm font-bold text-white">Update Member Selfie Photo</div>
-                  <div className="text-xs text-zinc-400 mt-0.5">Upload a clean front-facing selfie photo for ID verification.</div>
+                  <div className="text-[10px] uppercase font-bold text-zinc-500">Tier Division</div>
+                  <div className="mt-1"><Badge label={user.plan} /></div>
                 </div>
-                <label className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-xl border border-zinc-600 cursor-pointer transition-all inline-flex items-center gap-2">
-                  <span>📷 Upload New Selfie</span>
-                  <input type="file" accept="image/*" capture="user" onChange={handleSelfieChange} className="hidden" />
-                </label>
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-zinc-500">Club Role</div>
+                  <div className="mt-1"><Badge label={user.role} /></div>
+                </div>
+                <div className="mt-2">
+                  <div className="text-[10px] uppercase font-bold text-zinc-500">Account Status</div>
+                  <div className="mt-1"><Badge label={user.status} /></div>
+                </div>
+                <div className="mt-2">
+                  <div className="text-[10px] uppercase font-bold text-zinc-500">Aadhaar Card</div>
+                  <div className="text-xs font-mono text-zinc-300 mt-1 font-bold">{user.aadhaar ? `•••• ${user.aadhaar.slice(-4)}` : 'On File'}</div>
+                </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <Input label="First Name" value={form.fname} onChange={e=>setForm(f=>({...f,fname:e.target.value}))} />
-                <Input label="Last Name"  value={form.lname} onChange={e=>setForm(f=>({...f,lname:e.target.value}))} />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Input label="Phone Number" value={form.phone} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} />
-                <Input label="Aadhaar Card Number (12 Digits)" value={form.aadhaar} onChange={e=>setForm(f=>({...f,aadhaar:e.target.value}))} maxLength={12} placeholder="12-digit Aadhaar" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Input label="City / Location"  value={form.city}  onChange={e=>setForm(f=>({...f,city:e.target.value}))} />
-                <Input label="Telegram Chat ID / Phone" value={form.telegramChatId} onChange={e=>setForm(f=>({...f,telegramChatId:e.target.value}))} placeholder="e.g. 123456789 or @handle" />
-              </div>
-              
-              <div className="pt-2">
-                <Btn onClick={save} disabled={saving}>{saving?'Saving Details…':'Save Profile Changes →'}</Btn>
-              </div>
-            </CardBody>
+            </div>
           </Card>
+        </div>
 
-          {/* Change Password */}
+        {/* Update Form */}
+        <div className="lg:col-span-7">
           <Card>
-            <CardHeader><span className="font-bold text-base text-white">🔐 Security & Password</span></CardHeader>
-            <CardBody className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Input label="Current Password" type="password" value={oldPass} onChange={e=>setOld(e.target.value)} placeholder="••••••••" />
-                <Input label="New Password"     type="password" value={newPass} onChange={e=>setNew(e.target.value)} placeholder="Min 6 characters" />
-              </div>
-              <div className="pt-2">
-                <Btn onClick={changePass} disabled={saving} variant="ghost">{saving?'Changing…':'Update Password'}</Btn>
-              </div>
+            <CardHeader>
+              <span className="font-bold text-white text-base">✏️ Edit Personal Information</span>
+            </CardHeader>
+            <CardBody className="p-4 sm:p-6">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                
+                {/* Selfie Update Section */}
+                <div className="p-4 bg-zinc-900/80 border border-zinc-800 rounded-2xl flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+                  <div className="w-16 h-16 rounded-xl bg-zinc-800 border border-zinc-700 overflow-hidden flex items-center justify-center flex-shrink-0">
+                    {form.selfieUrl ? <img src={resolveImgUrl(form.selfieUrl)} alt="Selfie" className="w-full h-full object-cover" /> : <span>📷</span>}
+                  </div>
+                  <div className="flex-1 min-w-0 w-full">
+                    <div className="text-xs font-bold text-white mb-1">Update Selfie Photo</div>
+                    <p className="text-xs text-zinc-400 mb-2">Upload a crisp photo for your official club identity badge.</p>
+                    <label className="px-3.5 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-xl border border-zinc-600 cursor-pointer inline-flex items-center justify-center gap-1.5 transition-all w-full sm:w-auto">
+                      <span>{form.selfieUrl ? '🔄 Replace Photo' : '➕ Upload Photo'}</span>
+                      <input type="file" accept="image/*" capture="user" onChange={handleSelfieChange} className="hidden" />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 mb-1.5">First Name</label>
+                    <input required value={form.fname} onChange={e=>setForm({...form, fname: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Last Name</label>
+                    <input required value={form.lname} onChange={e=>setForm({...form, lname: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Registered Email (Read-only)</label>
+                  <input disabled value={user.email} className="w-full px-4 py-3 border border-zinc-800 rounded-xl text-sm bg-zinc-900/60 text-zinc-400 font-medium cursor-not-allowed" />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Phone Number</label>
+                    <input required value={form.phone} onChange={e=>setForm({...form, phone: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 mb-1.5">City / Location</label>
+                    <input value={form.city} onChange={e=>setForm({...form, city: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-zinc-800 flex justify-end">
+                  <Btn type="submit" variant="primary" disabled={saving} className="w-full sm:w-auto">
+                    {saving ? 'Saving Changes…' : 'Save Profile Changes →'}
+                  </Btn>
+                </div>
+              </form>
             </CardBody>
           </Card>
         </div>

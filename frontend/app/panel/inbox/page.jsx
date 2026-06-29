@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import AppLayout from '@/components/AppLayout';
 import { Card, CardHeader, Btn, Textarea, Loading, Empty, toast, Badge } from '@/components/ui';
-import { api, fmtTime, getUser, PLANS } from '@/lib/api';
+import { api, fmtTime, getUser, PLANS, resolveImgUrl } from '@/lib/api';
 
 export default function PanelInboxPage() {
   const [msgs, setMsgs]     = useState([]);
@@ -80,7 +80,7 @@ export default function PanelInboxPage() {
                           <div className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center text-xs font-bold text-white flex-shrink-0 border bg-zinc-800"
                             style={{ borderColor: pl.color || '#f97316' }}>
                             {sender?.selfieUrl || sender?.avatarUrl ? (
-                              <img src={sender?.selfieUrl || sender?.avatarUrl} alt="" className="w-full h-full object-cover" />
+                              <img src={resolveImgUrl(sender?.selfieUrl || sender?.avatarUrl)} alt="" className="w-full h-full object-cover" />
                             ) : (
                               <span>{(sender?.fname?.[0]||'')+(sender?.lname?.[0]||'')}</span>
                             )}
@@ -138,11 +138,11 @@ export default function PanelInboxPage() {
                     })}
                   </div>
                   {active.status !== 'CLOSED' && (
-                    <div className="p-4 border-t border-zinc-800/80 bg-zinc-900/40 flex gap-3">
+                    <div className="p-4 border-t border-zinc-800/80 bg-zinc-900/40 flex flex-col sm:flex-row gap-3">
                       <textarea value={reply} onChange={e=>setReply(e.target.value)} rows={2} placeholder={`Type official committee reply to ${active.fromId?.fname}…`}
                         className="flex-1 px-4 py-3 border border-zinc-700 rounded-xl text-sm text-white bg-[#1a1a24] outline-none focus:border-orange-500 resize-none font-medium" />
                       <button onClick={sendReply} disabled={sending||!reply}
-                        className="px-6 bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-sm rounded-xl shadow transition-all disabled:opacity-40">
+                        className="w-full sm:w-auto px-6 py-3 bg-orange-600 hover:bg-orange-500 text-white font-extrabold text-sm rounded-xl shadow transition-all disabled:opacity-40">
                         Dispatch Reply ↵
                       </button>
                     </div>
