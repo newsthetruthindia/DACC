@@ -44,18 +44,19 @@ router.post('/submit', protect, upload.single('screenshot'), async (req, res) =>
     const month = forMonth || currentMonth();
     const plan  = req.user.plan;
 
-    // Upsert: create or update existing pending record
+    const updateFields = {
+      userId: req.user._id,
+      forMonth: month,
+      amount: PLANS[plan].price,
+      plan,
+      status: 'PENDING',
+    };
+    if (upiRef !== undefined) updateFields.upiRef = upiRef || null;
+    if (req.file) updateFields.screenshotUrl = `/uploads/payments/${req.file.filename}`;
+
     const payment = await Payment.findOneAndUpdate(
       { userId: req.user._id, forMonth: month },
-      {
-        userId: req.user._id,
-        forMonth: month,
-        amount: PLANS[plan].price,
-        plan,
-        upiRef: upiRef || null,
-        screenshotUrl: req.file ? `/uploads/payments/${req.file.filename}` : null,
-        status: 'PENDING',
-      },
+      { $set: updateFields },
       { upsert: true, new: true }
     );
 

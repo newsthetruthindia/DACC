@@ -19,7 +19,7 @@ export default function AppLayout({ children }) {
     api.myProfile().then(r => {
       if (r.data) {
         setUser(r.data);
-        const token = localStorage.getItem('agnichakra_token');
+        const token = localStorage.getItem('ac_token');
         if (token) saveAuth(token, r.data);
       }
     }).catch(() => {});

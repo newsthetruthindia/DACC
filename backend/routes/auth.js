@@ -115,7 +115,26 @@ router.post('/otp/verify', async (req, res) => {
     await otp.save();
 
     const user = await User.findOne({ email: email.toLowerCase() });
-    res.json({ success: true, data: { token: signToken(user._id) } });
+    if (!user.memberId) {
+      const num = Math.floor(100000 + Math.random() * 900000);
+      user.memberId = `AGC-${num}`;
+      await user.save();
+    }
+
+    res.json({
+      success: true,
+      data: {
+        token: signToken(user._id),
+        user: {
+          id: user._id, fname: user.fname, lname: user.lname,
+          email: user.email, phone: user.phone,
+          plan: user.plan, role: user.role, status: user.status,
+          avatarUrl: user.avatarUrl, selfieUrl: user.selfieUrl,
+          memberId: user.memberId, aadhaar: user.aadhaar, city: user.city,
+          telegramChatId: user.telegramChatId, telegramUsername: user.telegramUsername,
+        }
+      }
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

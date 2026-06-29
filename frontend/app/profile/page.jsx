@@ -38,7 +38,7 @@ export default function ProfilePage() {
     try {
       const r = await api.updateProfile(form);
       const updated = { ...getUser(), ...r.data };
-      saveAuth(localStorage.getItem('agnichakra_token'), updated);
+      saveAuth(localStorage.getItem('ac_token'), updated);
       setUser(updated);
       toast('Profile details updated successfully ✓');
     } catch (err) { toast(err.message,'error'); } finally { setSaving(false); }
