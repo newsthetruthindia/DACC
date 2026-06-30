@@ -59,7 +59,7 @@ export default function PanelPaymentsPage() {
 
       {/* Summary */}
       {summary && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           {[
             { label:'Total Athletes',   val:summary.total,        color:'#ffffff', icon:'👥' },
             { label:'Verified Paid',    val:summary.confirmed,    color:'#10b981', icon:'✅' },

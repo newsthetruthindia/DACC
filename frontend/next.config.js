@@ -1,3 +1,8 @@
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  disable: process.env.NODE_ENV === 'development',
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: {
@@ -6,4 +11,5 @@ const nextConfig = {
     NEXT_PUBLIC_CLUB_NAME:  process.env.NEXT_PUBLIC_CLUB_NAME,
   },
 };
-module.exports = nextConfig;
+
+module.exports = withPWA(nextConfig);

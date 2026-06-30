@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const multer = require('multer');
 const path   = require('path');
-const { Payment, User, ClubTerm } = require('../models');
+const { Payment, User, ClubTerm, FundTransaction } = require('../models');
 const { protect, restrictTo } = require('../middleware/auth');
 const { PLANS, buildUpiLink, currentMonth } = require('../lib/plans');
 const { sendPaymentConfirmed, sendPaymentReminder } = require('../lib/email');
@@ -12,7 +12,14 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/payments/'),
   filename:    (req, file, cb) => cb(null, `pay_${Date.now()}${path.extname(file.originalname)}`),
 });
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
+const fileFilter = (req, file, cb) => {
+  if (['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Invalid file type. Only JPEG, PNG, and WebP images are allowed.'), false);
+  }
+};
+const upload = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024 } });
 
 // ── GET /payments/my ──────────────────────────────────────────
 router.get('/my', protect, async (req, res) => {
@@ -28,9 +35,12 @@ router.get('/my', protect, async (req, res) => {
 router.get('/upi-link', protect, async (req, res) => {
   try {
     const month = req.query.month || currentMonth();
+    const amount = req.query.amount ? Number(req.query.amount) : null;
+    const note = req.query.note || null;
     const plan  = req.user.plan;
-    const link  = buildUpiLink(plan, month);
-    res.json({ success: true, data: { link, amount: PLANS[plan].price, month, plan } });
+    const link  = buildUpiLink(plan, month, amount, note);
+    const finalAmount = amount || (PLANS[plan] ? PLANS[plan].price : 100);
+    res.json({ success: true, data: { link, amount: finalAmount, month, plan } });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -40,14 +50,16 @@ router.get('/upi-link', protect, async (req, res) => {
 // Member submits UTR + optional screenshot after paying via UPI
 router.post('/submit', protect, upload.single('screenshot'), async (req, res) => {
   try {
-    const { forMonth, upiRef } = req.body;
+    const { forMonth, upiRef, amount } = req.body;
     const month = forMonth || currentMonth();
     const plan  = req.user.plan;
+    const isDonation = month.startsWith('DONATION');
+    const finalAmt = isDonation && amount ? Number(amount) : (PLANS[plan] ? PLANS[plan].price : 100);
 
     const updateFields = {
       userId: req.user._id,
       forMonth: month,
-      amount: PLANS[plan].price,
+      amount: finalAmt,
       plan,
       status: 'PENDING',
     };
@@ -66,6 +78,7 @@ router.post('/submit', protect, upload.single('screenshot'), async (req, res) =>
   }
 });
 
+
 // ── POST /payments/confirm ────────────────────────────────────
 router.post('/confirm', protect, restrictTo('PANEL', 'SUPER_ADMIN', 'ACCOUNTANT'), async (req, res) => {
   try {
@@ -78,8 +91,19 @@ router.post('/confirm', protect, restrictTo('PANEL', 'SUPER_ADMIN', 'ACCOUNTANT'
 
     if (!payment) return res.status(404).json({ success: false, error: 'Payment not found' });
 
-    // Send confirmation email & telegram alert
     const u = payment.userId;
+    const isDon = payment.forMonth && payment.forMonth.startsWith('DONATION');
+
+    // Automatically log in Club Ledger (FundTransaction)
+    await FundTransaction.create({
+      title: isDon ? `One-Time Donation – ${u.fname} ${u.lname}` : `Membership Contribution (${payment.forMonth}) – ${u.fname} ${u.lname}`,
+      type: 'INCOME',
+      category: isDon ? 'Donation' : 'Membership Dues',
+      amount: payment.amount,
+      addedBy: req.user._id
+    }).catch(console.error);
+
+    // Send confirmation email & telegram alert
     sendPaymentConfirmed(u.email, u.fname, payment.forMonth, payment.amount).catch(console.error);
     notifyPaymentConfirmed(u, payment.amount, payment.forMonth, false).catch(console.error);
 

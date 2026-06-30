@@ -37,7 +37,7 @@ export const api = {
 
   // Payments
   myPayments:     ()     => request('GET',  '/payments/my'),
-  upiLink:        (m)    => request('GET',  `/payments/upi-link?month=${m}`),
+  upiLink:        (m, amt, note) => request('GET',  `/payments/upi-link?month=${m || ''}${amt ? `&amount=${amt}` : ''}${note ? `&note=${encodeURIComponent(note)}` : ''}`),
   submitPayment:  (fd)   => request('POST', '/payments/submit', fd, true),
   confirmPayment: (id)   => request('POST', '/payments/confirm', { paymentId:id }),
   pendingPayments:()     => request('GET',  '/payments/pending'),
@@ -86,9 +86,10 @@ export const api = {
 };
 
 export const PLANS = {
-  SILVER:   { label:'Silver',   price:300,  color:'#888888',  bg:'#f0f0f0' },
-  GOLD:     { label:'Gold',     price:500,  color:'#b8860b',  bg:'#fef3cd' },
-  PLATINUM: { label:'Platinum', price:1000, color:'#5b3db8',  bg:'#ede8ff' },
+  REGULAR:  { label:'Standard Member', price:100, color:'#f97316', bg:'#fff7ed' },
+  SILVER:   { label:'Standard Member', price:100, color:'#f97316', bg:'#fff7ed' },
+  GOLD:     { label:'Standard Member', price:100, color:'#f97316', bg:'#fff7ed' },
+  PLATINUM: { label:'Standard Member', price:100, color:'#f97316', bg:'#fff7ed' },
 };
 
 export const fmtMonth = (ym) => {

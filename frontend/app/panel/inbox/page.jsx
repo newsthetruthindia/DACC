@@ -52,7 +52,7 @@ export default function PanelInboxPage() {
         </div>
       </div>
 
-      <div className="flex gap-3 mb-6">
+      <div className="flex flex-wrap gap-3 mb-6">
         {['OPEN','REPLIED','CLOSED'].map(f => (
           <button key={f} onClick={() => { setFilter(f); setActive(null); }}
             className={`px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all shadow ${filter===f ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white' : 'bg-[#13131a] border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'}`}>

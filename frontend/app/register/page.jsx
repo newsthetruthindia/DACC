@@ -6,15 +6,13 @@ import { api, saveAuth, PLANS, compressImage, resolveImgUrl } from '@/lib/api';
 import { Btn } from '@/components/ui';
 
 const PLAN_LIST = [
-  { key:'SILVER',   features:['Member access','Event invites','Newsletter'] },
-  { key:'GOLD',     features:['All Silver benefits','Priority seating','Voting rights'] },
-  { key:'PLATINUM', features:['All Gold benefits','Panel eligibility','4 Guest passes/year'] },
+  { key:'REGULAR', features:['Full Portal & Community Access','Event Invites & Club Voting Rights','Standard ₹100/Month Dues','Optional One-Time Club Donation Supported'] },
 ];
 
 export default function RegisterPage() {
   const router = useRouter();
   const [step, setStep]     = useState(1);
-  const [plan, setPlan]     = useState('SILVER');
+  const [plan, setPlan]     = useState('REGULAR');
   const [form, setForm]     = useState({ fname:'', lname:'', email:'', phone:'', password:'', confirm:'', city:'', aadhaar:'', selfieUrl:'' });
   const [loading, setLoading] = useState(false);
   const [error, setError]   = useState('');
@@ -148,11 +146,11 @@ export default function RegisterPage() {
           {/* STEP 2 — Choose Plan */}
           {step === 2 && (
             <div>
-              <h2 className="font-bold text-white text-base mb-1">Select Membership Plan</h2>
-              <p className="text-zinc-400 text-xs mb-5">Choose your division for the club season.</p>
+              <h2 className="font-bold text-white text-base mb-1">Confirm Standard Membership</h2>
+              <p className="text-zinc-400 text-xs mb-5">All club members enjoy equal privileges at a flat ₹100/month contribution.</p>
               <div className="space-y-3 mb-6">
                 {PLAN_LIST.map(p => {
-                  const info = PLANS[p.key];
+                  const info = PLANS[p.key] || PLANS.REGULAR;
                   const active = plan === p.key;
                   return (
                     <div key={p.key} onClick={() => setPlan(p.key)}
@@ -161,8 +159,8 @@ export default function RegisterPage() {
                       }`}>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-white text-base">{info.label} Plan</span>
-                          {active && <span className="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">SELECTED</span>}
+                          <span className="font-bold text-white text-base">{info.label}</span>
+                          <span className="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">ACTIVE PLAN</span>
                         </div>
                         <ul className="mt-1.5 space-y-1 sm:space-y-0.5">
                           {p.features.map((f,i) => <li key={i} className="text-xs text-zinc-300 sm:text-zinc-400">✓ {f}</li>)}
@@ -171,7 +169,7 @@ export default function RegisterPage() {
                       <div className="text-left sm:text-right pt-2 sm:pt-0 border-t sm:border-0 border-zinc-800/80 flex sm:block justify-between items-baseline">
                         <div className="text-xs text-zinc-400 sm:hidden">Price:</div>
                         <div>
-                          <span className="text-xl font-extrabold text-white">₹{info.price}</span>
+                          <span className="text-2xl font-black text-white">₹100</span>
                           <span className="text-[10px] text-zinc-400 font-medium ml-1 sm:ml-0 sm:block">per month</span>
                         </div>
                       </div>
@@ -179,10 +177,13 @@ export default function RegisterPage() {
                   );
                 })}
               </div>
+              <div className="p-3.5 rounded-xl bg-orange-500/10 border border-orange-500/30 mb-6 text-xs text-orange-200">
+                💡 <strong className="text-white">Note:</strong> You can also contribute a one-time voluntary club donation of any amount anytime from your dashboard after registration.
+              </div>
               <div className="flex flex-col sm:flex-row gap-3">
                 <button onClick={() => setStep(1)} className="w-full sm:w-auto px-5 py-3.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-semibold text-sm transition-all order-2 sm:order-1">← Back</button>
                 <button onClick={handleRegister} disabled={loading} className="w-full sm:flex-1 py-3.5 primary-btn rounded-xl font-bold text-sm shadow-lg disabled:opacity-50 order-1 sm:order-2">
-                  {loading ? 'Registering...' : 'Register & Pay Season Dues →'}
+                  {loading ? 'Registering...' : 'Register & Pay Initial ₹100 Dues →'}
                 </button>
               </div>
             </div>

@@ -40,6 +40,10 @@ router.patch('/me', protect, async (req, res) => {
     const user = await User.findByIdAndUpdate(req.user._id, updates, { new: true }).select('-passwordHash');
     res.json({ success: true, data: user });
   } catch (err) {
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyValue)[0];
+      return res.status(400).json({ success: false, error: `This ${field} is already in use by another account.` });
+    }
     res.status(500).json({ success: false, error: err.message });
   }
 });

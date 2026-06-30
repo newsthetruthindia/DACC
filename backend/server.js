@@ -51,10 +51,14 @@ app.use((err, req, res, next) => {
 });
 
 // ── MongoDB + Start ───────────────────────────────────────────
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('✅ MongoDB connected');
-    const PORT = process.env.PORT || 4000;
-    app.listen(PORT, () => console.log(`🚀 Agnichakra API running on port ${PORT}`));
-  })
-  .catch(err => { console.error('MongoDB error:', err); process.exit(1); });
+if (require.main === module) {
+  mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+      console.log('✅ MongoDB connected');
+      const PORT = process.env.PORT || 4000;
+      app.listen(PORT, () => console.log(`🚀 Agnichakra API running on port ${PORT}`));
+    })
+    .catch(err => { console.error('MongoDB error:', err); process.exit(1); });
+}
+
+module.exports = app;

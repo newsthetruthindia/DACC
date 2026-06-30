@@ -9,6 +9,7 @@ export default function MySubscriptionPage() {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading]   = useState(true);
   const [upiModal, setUpiModal] = useState(null);
+  const [donAmt, setDonAmt]     = useState('501');
   
   // Track UTR inputs per month string
   const [utrs, setUtrs]         = useState({});
@@ -50,7 +51,7 @@ export default function MySubscriptionPage() {
   };
 
   if (loading || !user) return <AppLayout><Loading /></AppLayout>;
-  const pl = PLANS[user.plan] || PLANS.SILVER;
+  const pl = PLANS[user.plan] || PLANS.REGULAR;
 
   // Generate list of recent months (e.g., current month and past 3 months)
   const monthsList = [curMonth];
@@ -69,17 +70,17 @@ export default function MySubscriptionPage() {
             Financial Ledger Desk
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">💳 My Subscription & Dues</h1>
-          <p className="text-xs sm:text-sm text-zinc-300 mt-1 font-medium">Verify your season contributions, submit Bank UTR numbers, and download receipts.</p>
+          <p className="text-xs sm:text-sm text-zinc-300 mt-1 font-medium">Standard ₹100/mo club dues & one-time voluntary donation portal.</p>
         </div>
         <div className="flex items-center gap-3 bg-[#13131a] p-3.5 sm:p-4 rounded-2xl border border-zinc-800">
           <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-xl">
             🏆
           </div>
           <div>
-            <div className="text-xs text-zinc-400 font-semibold uppercase tracking-wider">Current Tier</div>
+            <div className="text-xs text-zinc-400 font-semibold uppercase tracking-wider">Club Division</div>
             <div className="text-base font-extrabold text-white flex items-center gap-1.5">
-              <span>{pl.label} Plan</span>
-              <span className="text-xs text-orange-400 font-mono">(₹{pl.price}/mo)</span>
+              <span>Standard Member</span>
+              <span className="text-xs text-orange-400 font-mono">(₹100/mo)</span>
             </div>
           </div>
         </div>
@@ -90,7 +91,7 @@ export default function MySubscriptionPage() {
         <div className="lg:col-span-7 space-y-6">
           <Card className="bg-[#13131a] border-zinc-800 shadow-xl overflow-hidden">
             <CardHeader className="border-b border-zinc-800/80 bg-zinc-900/50">
-              <span className="font-extrabold text-base text-white">🗓️ Active Season Dues Ledger</span>
+              <span className="font-extrabold text-base text-white">🗓️ Active Season Dues Ledger (₹100/mo)</span>
             </CardHeader>
             <div className="divide-y divide-zinc-800/80">
               {monthsList.map(mStr => {
@@ -99,54 +100,46 @@ export default function MySubscriptionPage() {
                 const isCur = mStr === curMonth;
 
                 return (
-                  <div key={mStr} className={`p-4 sm:p-6 transition-colors ${isCur ? 'bg-orange-500/5' : 'hover:bg-zinc-900/30'}`}>
+                  <div key={mStr} className={`p-5 transition-colors ${isCur ? 'bg-orange-500/[0.04]' : ''}`}>
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div>
-                        <div className="flex items-center gap-2.5 flex-wrap">
-                          <span className="text-base sm:text-lg font-black text-white">{mStr} Contribution</span>
-                          {isCur && <span className="text-[10px] bg-orange-500 text-white font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Current</span>}
-                          <Badge label={status === 'CONFIRMED' ? 'PAID' : status} />
+                        <div className="flex items-center gap-2.5">
+                          <span className="font-black text-lg text-white">{mStr}</span>
+                          {isCur && <span className="px-2 py-0.5 text-[10px] font-black bg-orange-500 text-white rounded-full uppercase">Current Month</span>}
                         </div>
-                        <div className="text-xs text-zinc-400 font-medium mt-1">
-                          Amount: <strong className="text-white">₹{pl.price}</strong> · Destination: <span className="font-mono text-zinc-300">Agnichakra Club Account</span>
+                        <div className="text-xs text-zinc-400 mt-1">
+                          Fixed Membership Contribution: <strong className="text-white">₹100</strong>
                         </div>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-                        {status === 'CONFIRMED' ? (
-                          <div className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl text-xs font-bold">
-                            <span>✓ Receipt Verified</span>
-                          </div>
-                        ) : status === 'PENDING' ? (
-                          <div className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-xl text-xs font-bold">
-                            <span>⏳ Committee Verifying</span>
-                          </div>
-                        ) : (
-                          <button
+                      <div className="flex items-center gap-3">
+                        <Badge label={status === 'CONFIRMED' ? 'PAID' : status} />
+                        {status !== 'CONFIRMED' && (
+                          <Btn
+                            size="sm"
+                            variant={status === 'PENDING' ? 'secondary' : 'primary'}
                             onClick={async () => {
                               const r = await api.upiLink(mStr);
-                              setUpiModal({ link: r.data.link, amount: r.data.amount, memberName: `${user.fname} ${user.lname}`, month: mStr });
-                            }}
-                            className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-extrabold text-xs rounded-xl shadow transition-all flex items-center justify-center gap-1.5">
-                            <span>💳 Pay ₹{pl.price} UPI →</span>
-                          </button>
+                              setUpiModal({ link: r.data.link, amount: r.data.amount || 100, month: mStr, memberName: `${user.fname} ${user.lname}` });
+                            }}>
+                            {status === 'PENDING' ? 'Re-Pay / View QR' : 'Pay ₹100 via UPI →'}
+                          </Btn>
                         )}
                       </div>
                     </div>
 
-                    {/* If Paid outside portal or UTR required */}
+                    {/* UTR Input Section */}
                     {status !== 'CONFIRMED' && (
-                      <div className="mt-4 pt-4 border-t border-zinc-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#161620] p-3.5 rounded-xl border">
-                        <div className="text-xs text-zinc-300 font-medium">
-                          Already paid via app? Enter 12-digit Bank Reference / UTR number:
-                        </div>
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                      <div className="mt-4 pt-3 border-t border-zinc-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-900/40 p-3 rounded-xl">
+                        <span className="text-xs text-zinc-400 font-medium">Already paid? Log UTR Reference:</span>
+                        <div className="flex items-center gap-2">
                           <input
+                            type="text"
+                            placeholder="Enter 12-digit UTR Ref"
+                            maxLength={12}
                             value={utrs[mStr] || ''}
-                            onChange={e => setUtrs({ ...utrs, [mStr]: e.target.value })}
-                            placeholder="12-digit UTR ref"
-                            maxLength={16}
-                            className="w-full sm:w-40 px-3 py-2 bg-[#1a1a24] border border-zinc-700 rounded-lg text-xs text-white font-mono outline-none focus:border-orange-500"
+                            onChange={e => setUtrs(u => ({ ...u, [mStr]: e.target.value }))}
+                            className="px-3 py-1.5 bg-[#14141c] border border-zinc-700 rounded-lg text-xs text-white outline-none focus:border-orange-500 font-mono tracking-wider w-44 placeholder:tracking-normal placeholder:font-sans"
                           />
                           <button
                             onClick={() => handleUtrSubmit(mStr)}
@@ -164,8 +157,33 @@ export default function MySubscriptionPage() {
           </Card>
         </div>
 
-        {/* Payment History Roster */}
-        <div className="lg:col-span-5">
+        {/* Voluntary Donation & Payment History Roster */}
+        <div className="lg:col-span-5 space-y-6">
+          <Card className="bg-gradient-to-br from-orange-500/[0.08] to-transparent border-orange-500/30 shadow-xl overflow-hidden">
+            <CardHeader className="border-b border-orange-500/20 bg-orange-500/10">
+              <span className="font-extrabold text-base text-white flex items-center gap-2">
+                <span>🙏</span> Make a One-Time Club Donation
+              </span>
+            </CardHeader>
+            <div className="p-5 space-y-3">
+              <p className="text-xs text-zinc-300 leading-relaxed">
+                Want to contribute extra towards club events, social welfare, or sports infrastructure? Support the club with any one-time amount of your choice.
+              </p>
+              <div className="flex items-center gap-2 pt-1">
+                <div className="relative flex-1">
+                  <span className="absolute left-3.5 top-2.5 text-zinc-400 font-bold text-sm">₹</span>
+                  <input type="number" value={donAmt} onChange={(e) => setDonAmt(e.target.value)} placeholder="501"
+                    className="w-full pl-8 pr-3 py-2 bg-black/40 border border-white/15 focus:border-orange-500 rounded-xl text-sm font-bold text-white outline-none" />
+                </div>
+                <Btn variant="primary" size="sm" className="font-black px-5 shadow-orange-500/30" onClick={async () => {
+                  const amt = Number(donAmt) > 0 ? Number(donAmt) : 501;
+                  const donMonth = `DONATION-${Date.now().toString().slice(-6)}`;
+                  const r = await api.upiLink(donMonth, amt, `One-Time Donation by ${user.fname}`);
+                  setUpiModal({ link: r.data.link, amount: amt, month: 'Voluntary Club Donation', memberName: `${user.fname} ${user.lname}`, forMonth: donMonth });
+                }}>Contribute Now →</Btn>
+              </div>
+            </div>
+          </Card>
           <Card className="bg-[#13131a] border-zinc-800 shadow-xl overflow-hidden">
             <CardHeader className="border-b border-zinc-800/80 bg-zinc-900/50">
               <span className="font-extrabold text-base text-white">📜 Past Transaction History</span>
@@ -176,7 +194,7 @@ export default function MySubscriptionPage() {
                 : payments.map((p, i) => (
                   <div key={p._id || i} className="p-4 sm:p-5 hover:bg-zinc-900/40 transition-colors">
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <span className="font-bold text-sm sm:text-base text-white">{p.forMonth} Contribution</span>
+                      <span className="font-bold text-sm sm:text-base text-white">{p.forMonth?.startsWith('DONATION') ? 'Voluntary Club Donation' : `${p.forMonth} Contribution`}</span>
                       <Badge label={p.status === 'CONFIRMED' ? 'PAID' : p.status} />
                     </div>
                     <div className="flex items-center justify-between text-xs text-zinc-400 font-medium mt-1">
@@ -198,9 +216,13 @@ export default function MySubscriptionPage() {
 
       {upiModal && (
         <UpiModal open={!!upiModal} link={upiModal.link} amount={upiModal.amount} month={upiModal.month}
-          memberName={upiModal.memberName} onClose={() => setUpiModal(null)} onMarkPaid={() => {
+          memberName={upiModal.memberName} onClose={() => setUpiModal(null)} onMarkPaid={async () => {
+            const fd = new FormData();
+            fd.append('forMonth', upiModal.forMonth || upiModal.month);
+            if (upiModal.amount) fd.append('amount', upiModal.amount);
+            await api.submitPayment(fd);
             setUpiModal(null);
-            toast('Payment dispatched! Committee verification pending.');
+            toast('Payment logged & dispatched! Committee verification pending.');
             load();
           }} />
       )}
