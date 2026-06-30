@@ -4,7 +4,7 @@ import AppLayout from '@/components/AppLayout';
 import { Card, Loading, Empty } from '@/components/ui';
 import { api, fmtTime } from '@/lib/api';
 
-const TARGET_LABELS = { ALL:'All Members', SILVER:'Silver Division', GOLD:'Gold & above', PLATINUM:'Platinum Leaders', PANEL:'Committee Only' };
+const TARGET_LABELS = { ALL:'All Members', SILVER:'Standard Members', GOLD:'Standard Members', PLATINUM:'Standard Members', PANEL:'Committee Only' };
 
 export default function NotificationsPage() {
   const [notifs, setNotifs] = useState([]);

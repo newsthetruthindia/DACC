@@ -102,9 +102,8 @@ export default function PanelPage() {
                   <div className="font-extrabold text-xl text-white mt-1">{u?.fname} {u?.lname}</div>
                   <div className="text-xs text-zinc-400 font-mono mt-0.5">{u?.memberId || 'AGC-LEADER'}</div>
 
-                  <div className="mt-4 pt-4 border-t border-zinc-800/80 w-full flex items-center justify-between text-xs text-zinc-300 font-semibold">
-                    <span>Division: <Badge label={u?.plan || 'PLATINUM'} /></span>
-                    <span className="text-emerald-400">Verified Leader ✓</span>
+                  <div className="mt-4 pt-4 border-t border-zinc-800/80 w-full flex items-center justify-center text-xs text-zinc-300 font-semibold">
+                    <span className="text-emerald-400 font-bold">Verified Executive Committee Leader ✓</span>
                   </div>
                 </div>
               );

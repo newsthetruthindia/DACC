@@ -135,7 +135,7 @@ export default function RegisterPage() {
               </div>
               
               <button type="submit" className="w-full py-3.5 primary-btn rounded-xl font-bold text-sm shadow-lg mt-6">
-                Continue to Plan →
+                Continue to Contribution Confirmation →
               </button>
               <p className="text-center text-xs sm:text-sm text-zinc-400 mt-4">
                 Already a registered member? <Link href="/login" className="text-orange-400 font-semibold hover:underline">Login</Link>
@@ -143,7 +143,7 @@ export default function RegisterPage() {
             </form>
           )}
 
-          {/* STEP 2 — Choose Plan */}
+          {/* STEP 2 — Confirm Contribution */}
           {step === 2 && (
             <div>
               <h2 className="font-bold text-white text-base mb-1">Confirm Standard Membership</h2>
@@ -151,16 +151,13 @@ export default function RegisterPage() {
               <div className="space-y-3 mb-6">
                 {PLAN_LIST.map(p => {
                   const info = PLANS[p.key] || PLANS.REGULAR;
-                  const active = plan === p.key;
                   return (
-                    <div key={p.key} onClick={() => setPlan(p.key)}
-                      className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-                        active ? 'border-orange-500 bg-orange-500/10' : 'border-zinc-800 bg-zinc-900/60 hover:border-zinc-700'
-                      }`}>
+                    <div key={p.key}
+                      className="p-4 rounded-xl border-2 border-orange-500 bg-orange-500/10 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-white text-base">{info.label}</span>
-                          <span className="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">ACTIVE PLAN</span>
+                          <span className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">1 PAYMENT POLICY</span>
                         </div>
                         <ul className="mt-1.5 space-y-1 sm:space-y-0.5">
                           {p.features.map((f,i) => <li key={i} className="text-xs text-zinc-300 sm:text-zinc-400">✓ {f}</li>)}

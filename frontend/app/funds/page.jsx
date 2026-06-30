@@ -214,14 +214,14 @@ export default function ClubFundsPage() {
             <table className="w-full border-collapse text-sm">
               <thead>
                 <tr className="bg-zinc-900/80 text-zinc-400 font-bold text-xs uppercase tracking-wider border-b border-zinc-800">
-                  {['Member Athlete','Unique ID','Division','Current Month Status', canManage ? 'Accountant Entry' : ''].filter(Boolean).map(h => (
+                  {['Member Athlete','Unique ID','Current Month Status', canManage ? 'Accountant Entry' : ''].filter(Boolean).map(h => (
                     <th key={h} className="text-left px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/80">
                 {roster.length === 0
-                  ? <tr><td colSpan={5}><Empty icon="👥" title="No active members in roster" /></td></tr>
+                  ? <tr><td colSpan={4}><Empty icon="👥" title="No active members in roster" /></td></tr>
                   : roster.map(m => {
                       const pl = PLANS[m.plan] || PLANS.SILVER;
                       const isPaid = m.paidThisMonth;
@@ -246,7 +246,6 @@ export default function ClubFundsPage() {
                           <td className="px-4 py-3 sm:px-6 sm:py-4 font-mono font-bold text-xs text-orange-400 whitespace-nowrap">
                             {m.memberId || 'AGC-ID'}
                           </td>
-                          <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap"><Badge label={m.plan} /></td>
                           <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
                               isPaid ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/15 text-red-400 border border-red-500/30 animate-pulse'

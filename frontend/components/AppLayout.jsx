@@ -104,8 +104,8 @@ export default function AppLayout({ children }) {
               <span className="text-[10px] font-mono font-bold text-zinc-400 bg-white/[0.05] px-2 py-0.5 rounded-md border border-white/[0.06]">
                 {user.memberId || 'MEMBER'}
               </span>
-              <span className="text-[10px] font-bold tracking-wider uppercase" style={{ color: planColors[user.plan] || '#f97316' }}>
-                • {user.plan}
+              <span className="text-[10px] font-bold tracking-wider uppercase text-emerald-400">
+                • Official Member
               </span>
             </div>
           </div>

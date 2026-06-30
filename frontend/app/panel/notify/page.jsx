@@ -5,11 +5,8 @@ import { Card, CardHeader, CardBody, Btn, Input, Textarea, Loading, Empty, toast
 import { api, fmtTime } from '@/lib/api';
 
 const TARGETS = [
-  { key:'ALL',      label:'📢 All Active Athletes',     desc:'Broadcast immediately to every registered club member' },
-  { key:'SILVER',   label:'🥈 Silver Division Only',    desc:'Target exclusively Silver plan athletes' },
-  { key:'GOLD',     label:'🥇 Gold & Platinum Tiers',   desc:'Target Gold and Platinum division athletes' },
-  { key:'PLATINUM', label:'💎 Platinum VIP Leaders',    desc:'Target Platinum members only' },
-  { key:'PANEL',    label:'🏛️ Core Committee Only',     desc:'Confidential broadcast to executive committee appointees' },
+  { key:'ALL',   label:'📢 All Club Members',        desc:'Broadcast immediately to every registered club member' },
+  { key:'PANEL', label:'🏛️ Core Committee Only',      desc:'Confidential broadcast to executive committee appointees' },
 ];
 
 export default function SendNotifPage() {

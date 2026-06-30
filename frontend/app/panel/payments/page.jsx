@@ -102,7 +102,7 @@ export default function PanelPaymentsPage() {
                         <div className="min-w-0">
                           <div className="font-bold text-base text-white truncate">{u?.fname} {u?.lname}</div>
                           <div className="text-xs text-zinc-300 font-medium mt-0.5">
-                            <Badge label={pl.label} /> · Amount: <strong className="text-orange-400">₹{p.amount}</strong> · Month: <strong className="text-white">{p.forMonth}</strong>
+                            Amount: <strong className="text-orange-400">₹{p.amount}</strong> · Month: <strong className="text-white">{p.forMonth}</strong>
                           </div>
                           {p.upiRef && (
                             <div className="text-xs text-emerald-400 font-mono font-bold mt-1 bg-emerald-500/10 px-2.5 py-1 rounded border border-emerald-500/20 inline-block">

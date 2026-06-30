@@ -66,7 +66,7 @@ export default function DashboardPage() {
 
         <div className="relative z-10 space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-400 text-xs font-black tracking-wider uppercase shadow-sm">
-            <span>✨</span> Welcome Back · {plan.label} Plan
+            <span>✨</span> Welcome Back · Official Club Member
           </div>
           <h1 className="text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight drop-shadow-sm">
             Hello, {user.fname} {user.lname} 👋
@@ -157,16 +157,16 @@ export default function DashboardPage() {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-white/[0.08] to-white/[0.01] border border-white/[0.1] flex items-center justify-center text-2xl shadow-md">
-                    ⚡
+                    🛡️
                   </div>
-                  <Badge label="ACTIVE PLAN" />
+                  <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">VERIFIED ATHLETE</span>
                 </div>
-                <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Membership Division</div>
-                <div className="text-2xl font-black text-white tracking-tight mb-2">Standard Member</div>
-                <div className="text-sm text-zinc-400 font-medium">Fixed Contribution: <span className="text-orange-400 font-extrabold">₹1100/mo</span></div>
+                <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Club Governance Privileges</div>
+                <div className="text-2xl font-black text-white tracking-tight mb-2">Equal Member Standing</div>
+                <div className="text-sm text-zinc-400 font-medium">1 Payment Policy: <span className="text-orange-400 font-extrabold">All Tiers Unified</span></div>
               </div>
               <div className="mt-4 pt-4 border-t border-white/[0.06] text-xs text-zinc-400">
-                Equal voting rights & full club access
+                Equal voting rights & full tournament access
               </div>
             </CardBody>
           </Card>

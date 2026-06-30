@@ -77,7 +77,7 @@ export default function MySubscriptionPage() {
             🏆
           </div>
           <div>
-            <div className="text-xs text-zinc-400 font-semibold uppercase tracking-wider">Club Division</div>
+            <div className="text-xs text-zinc-400 font-semibold uppercase tracking-wider">Membership Standing</div>
             <div className="text-base font-extrabold text-white flex items-center gap-1.5">
               <span>Standard Member</span>
               <span className="text-xs text-orange-400 font-mono">(₹1100/mo)</span>

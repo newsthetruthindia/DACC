@@ -86,8 +86,8 @@ export default function ProfilePage() {
 
               <div className="w-full grid grid-cols-2 gap-3 mt-6 pt-6 border-t border-zinc-800/80 text-left">
                 <div>
-                  <div className="text-[10px] uppercase font-bold text-zinc-500">Tier Division</div>
-                  <div className="mt-1"><Badge label={user.plan} /></div>
+                  <div className="text-[10px] uppercase font-bold text-zinc-500">Membership Policy</div>
+                  <div className="mt-1 font-bold text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 inline-block">1 Payment Policy</div>
                 </div>
                 <div>
                   <div className="text-[10px] uppercase font-bold text-zinc-500">Club Role</div>

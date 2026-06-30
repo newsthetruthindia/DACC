@@ -132,11 +132,6 @@ export default function AdminMembersPage() {
             <option value="">All Statuses</option>
             {['ACTIVE','PENDING','SUSPENDED','INACTIVE'].map(s=><option key={s} value={s}>{s}</option>)}
           </select>
-          <select value={filterPlan} onChange={e=>setFP(e.target.value)}
-            className="w-full sm:w-auto px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white font-semibold outline-none focus:border-orange-500">
-            <option value="">All Plans</option>
-            {['SILVER','GOLD','PLATINUM'].map(p=><option key={p} value={p}>{p}</option>)}
-          </select>
         </div>
       </div>
 
@@ -148,14 +143,14 @@ export default function AdminMembersPage() {
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-zinc-900/80 text-zinc-400 font-bold text-xs uppercase tracking-wider border-b border-zinc-800">
-                {['Member Athlete & ID','KYC / Aadhaar','Plan','Role','Status','This Month','Actions'].map(h=>(
+                {['Member Athlete & ID','KYC / Aadhaar','Role','Status','This Month','Actions'].map(h=>(
                   <th key={h} className="text-left px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/80">
               {members.length === 0
-                ? <tr><td colSpan={7}><Empty icon="🔍" title="No matching members found" /></td></tr>
+                ? <tr><td colSpan={6}><Empty icon="🔍" title="No matching members found" /></td></tr>
                 : members.map(m => {
                     const pl = PLANS[m.plan] || PLANS.SILVER;
                     return (
@@ -182,7 +177,6 @@ export default function AdminMembersPage() {
                         <td className="px-4 py-3 sm:px-6 sm:py-4 font-mono text-xs text-zinc-300 whitespace-nowrap">
                           {m.aadhaar ? `•••• ${m.aadhaar.slice(-4)}` : <span className="text-zinc-500 italic">No Aadhaar</span>}
                         </td>
-                        <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap"><Badge label={m.plan} /></td>
                         <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap"><Badge label={m.role} /></td>
                         <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap"><Badge label={m.status} /></td>
                         <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
@@ -264,15 +258,7 @@ export default function AdminMembersPage() {
                   <input value={form.city} onChange={e=>setForm({...form, city: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white outline-none focus:border-orange-500" />
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-300 mb-1">Plan</label>
-                  <select value={form.plan} onChange={e=>setForm({...form, plan: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white font-semibold">
-                    <option value="SILVER">Silver (₹300)</option>
-                    <option value="GOLD">Gold (₹500)</option>
-                    <option value="PLATINUM">Platinum (₹1000)</option>
-                  </select>
-                </div>
+              <div className="grid grid-cols-1 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-zinc-300 mb-1">Role</label>
                   <select value={form.role} onChange={e=>setForm({...form, role: e.target.value})} className="w-full px-4 py-3 border border-zinc-700 rounded-xl text-sm bg-[#1a1a22] text-white font-semibold">

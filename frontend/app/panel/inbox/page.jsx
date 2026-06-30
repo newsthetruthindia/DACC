@@ -92,7 +92,7 @@ export default function PanelInboxPage() {
                             </div>
                             <div className="text-xs text-zinc-300 truncate font-medium">{m.body}</div>
                             <div className="text-[10px] text-zinc-500 font-mono mt-1 flex items-center gap-2">
-                              <span>{sender?.fname} {sender?.lname}</span> · <Badge label={sender?.plan || 'SILVER'} /> · <span>{fmtTime(m.createdAt)}</span>
+                              <span>{sender?.fname} {sender?.lname}</span> · <span className="text-orange-400 font-bold">{sender?.memberId || 'MEMBER'}</span> · <span>{fmtTime(m.createdAt)}</span>
                             </div>
                           </div>
                         </div>
