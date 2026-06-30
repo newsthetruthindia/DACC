@@ -6,7 +6,7 @@ import { api, saveAuth, PLANS, compressImage, resolveImgUrl } from '@/lib/api';
 import { Btn } from '@/components/ui';
 
 const PLAN_LIST = [
-  { key:'REGULAR', features:['Full Portal & Community Access','Event Invites & Club Voting Rights','Standard ₹100/Month Dues','Optional One-Time Club Donation Supported'] },
+  { key:'REGULAR', features:['Full Portal & Community Access','Event Invites & Club Voting Rights','Standard ₹1100/Month Dues','Optional One-Time Club Donation Supported'] },
 ];
 
 export default function RegisterPage() {
@@ -147,7 +147,7 @@ export default function RegisterPage() {
           {step === 2 && (
             <div>
               <h2 className="font-bold text-white text-base mb-1">Confirm Standard Membership</h2>
-              <p className="text-zinc-400 text-xs mb-5">All club members enjoy equal privileges at a flat ₹100/month contribution.</p>
+              <p className="text-zinc-400 text-xs mb-5">All club members enjoy equal privileges at a flat ₹1100/month contribution.</p>
               <div className="space-y-3 mb-6">
                 {PLAN_LIST.map(p => {
                   const info = PLANS[p.key] || PLANS.REGULAR;
@@ -169,7 +169,7 @@ export default function RegisterPage() {
                       <div className="text-left sm:text-right pt-2 sm:pt-0 border-t sm:border-0 border-zinc-800/80 flex sm:block justify-between items-baseline">
                         <div className="text-xs text-zinc-400 sm:hidden">Price:</div>
                         <div>
-                          <span className="text-2xl font-black text-white">₹100</span>
+                          <span className="text-2xl font-black text-white">₹1100</span>
                           <span className="text-[10px] text-zinc-400 font-medium ml-1 sm:ml-0 sm:block">per month</span>
                         </div>
                       </div>
@@ -183,7 +183,7 @@ export default function RegisterPage() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <button onClick={() => setStep(1)} className="w-full sm:w-auto px-5 py-3.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-semibold text-sm transition-all order-2 sm:order-1">← Back</button>
                 <button onClick={handleRegister} disabled={loading} className="w-full sm:flex-1 py-3.5 primary-btn rounded-xl font-bold text-sm shadow-lg disabled:opacity-50 order-1 sm:order-2">
-                  {loading ? 'Registering...' : 'Register & Pay Initial ₹100 Dues →'}
+                  {loading ? 'Registering...' : 'Register & Pay Initial ₹1100 Dues →'}
                 </button>
               </div>
             </div>

@@ -120,112 +120,117 @@ export default function DashboardPage() {
         <span className="w-2 h-2 rounded-full bg-amber-500"></span> My Membership Command
       </h2>
       <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-9">
-        <motion.div variants={item}>
+        <motion.div variants={item} className="h-full">
           <Card className="hover:border-white/20 hover:-translate-y-1 h-full">
-          <CardBody className="p-6 flex flex-col justify-between h-full">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-white/[0.08] to-white/[0.01] border border-white/[0.1] flex items-center justify-center text-2xl shadow-md">
-                  💳
+            <CardBody className="p-6 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-white/[0.08] to-white/[0.01] border border-white/[0.1] flex items-center justify-center text-2xl shadow-md">
+                    💳
+                  </div>
+                  <Badge label={isPaid ? 'PAID' : 'DUE'} />
                 </div>
-                <Badge label={isPaid ? 'PAID' : 'DUE'} />
-              </div>
-              <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Monthly Contribution ({month})</div>
-              <div className={`text-2xl font-black tracking-tight mb-2 ${isPaid ? 'text-emerald-400' : 'text-orange-400'}`}>
-                {isPaid ? 'Dues Paid' : 'Payment Due'}
-              </div>
-              <div className="text-sm text-zinc-400 font-medium">Standard Dues: <span className="text-white font-extrabold">₹100</span></div>
-            </div>
-            {!isPaid && (
-              <Btn size="sm" variant="primary" className="mt-5 w-full font-black shadow-orange-500/20" onClick={async () => {
-                const r = await api.upiLink(month);
-                setUpi({ link: r.data.link, amount: r.data.amount || 100, memberName: `${user.fname} ${user.lname}`, forMonth: month });
-              }}>Pay ₹100 Now</Btn>
-            )}
-            {thisPay?.status === 'PENDING' && (
-              <div className="mt-4 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs font-bold flex items-center gap-2">
-                <span>⏳</span> Verifying by Committee
-              </div>
-            )}
-          </CardBody>
-        </Card>
-
-        <Card className="hover:border-white/20 hover:-translate-y-1">
-          <CardBody className="p-6 flex flex-col justify-between h-full">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-white/[0.08] to-white/[0.01] border border-white/[0.1] flex items-center justify-center text-2xl shadow-md">
-                  ⚡
+                <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Monthly Contribution ({month})</div>
+                <div className={`text-2xl font-black tracking-tight mb-2 ${isPaid ? 'text-emerald-400' : 'text-orange-400'}`}>
+                  {isPaid ? 'Dues Paid' : 'Payment Due'}
                 </div>
-                <Badge label="ACTIVE PLAN" />
+                <div className="text-sm text-zinc-400 font-medium">Standard Dues: <span className="text-white font-extrabold">₹1100</span></div>
               </div>
-              <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Membership Division</div>
-              <div className="text-2xl font-black text-white tracking-tight mb-2">Standard Member</div>
-              <div className="text-sm text-zinc-400 font-medium">Fixed Contribution: <span className="text-orange-400 font-extrabold">₹100/mo</span></div>
-            </div>
-            <div className="mt-4 pt-4 border-t border-white/[0.06] text-xs text-zinc-400">
-              Equal voting rights & full club access
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card className="hover:border-white/20 hover:-translate-y-1">
-          <CardBody className="p-6 flex flex-col justify-between h-full">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-white/[0.08] to-white/[0.01] border border-white/[0.1] flex items-center justify-center text-2xl shadow-md">
-                  🏆
+              {!isPaid && (
+                <Btn size="sm" variant="primary" className="mt-5 w-full font-black shadow-orange-500/20" onClick={async () => {
+                  const r = await api.upiLink(month);
+                  setUpi({ link: r.data.link, amount: r.data.amount || 1100, memberName: `${user.fname} ${user.lname}`, forMonth: month });
+                }}>Pay ₹1100 Now</Btn>
+              )}
+              {thisPay?.status === 'PENDING' && (
+                <div className="mt-4 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs font-bold flex items-center gap-2">
+                  <span>⏳</span> Verifying by Committee
                 </div>
-                <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                  Good Standing
-                </span>
-              </div>
-              <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Longevity Record</div>
-              <div className="text-2xl font-black text-white tracking-tight mb-2">
-                {payments.filter(p => p.status === 'CONFIRMED' && !p.forMonth?.startsWith('DONATION')).length} Months
-              </div>
-              <div className="text-sm text-zinc-400 font-medium">Verified dues to date</div>
-            </div>
-            <div className="mt-4 pt-4 border-t border-white/[0.06] text-xs text-emerald-400 font-semibold">
-              Thank you for supporting DACC!
-            </div>
-          </CardBody>
-        </Card>
+              )}
+            </CardBody>
+          </Card>
         </motion.div>
 
-        <motion.div variants={item}>
-          <Card className="hover:border-white/20 hover:-translate-y-1 bg-gradient-to-br from-orange-500/[0.07] to-transparent border-orange-500/30 h-full">
-          <CardBody className="p-6 flex flex-col justify-between h-full">
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-12 h-12 rounded-2xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-2xl shadow-md">
-                  🙏
+        <motion.div variants={item} className="h-full">
+          <Card className="hover:border-white/20 hover:-translate-y-1 h-full">
+            <CardBody className="p-6 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-white/[0.08] to-white/[0.01] border border-white/[0.1] flex items-center justify-center text-2xl shadow-md">
+                    ⚡
+                  </div>
+                  <Badge label="ACTIVE PLAN" />
                 </div>
-                <span className="text-[10px] font-bold text-orange-400 bg-orange-500/15 px-2.5 py-1 rounded-full border border-orange-500/30 uppercase tracking-wider">
-                  One-Time Gift
-                </span>
+                <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Membership Division</div>
+                <div className="text-2xl font-black text-white tracking-tight mb-2">Standard Member</div>
+                <div className="text-sm text-zinc-400 font-medium">Fixed Contribution: <span className="text-orange-400 font-extrabold">₹1100/mo</span></div>
               </div>
-              <div className="text-xs font-bold uppercase tracking-wider text-orange-400 mb-1">Voluntary Club Donation</div>
-              <p className="text-xs text-zinc-300 leading-relaxed mb-3">
-                Support club events or development with any one-time custom amount.
-              </p>
-            </div>
-            <div className="space-y-2.5 mt-auto">
-              <div className="relative">
-                <span className="absolute left-3 top-2.5 text-zinc-400 font-bold text-sm">₹</span>
-                <input type="number" value={donAmt} onChange={(e) => setDonAmt(e.target.value)} placeholder="501"
-                  className="w-full pl-7 pr-3 py-2 bg-black/40 border border-white/15 focus:border-orange-500 rounded-xl text-sm font-bold text-white outline-none" />
+              <div className="mt-4 pt-4 border-t border-white/[0.06] text-xs text-zinc-400">
+                Equal voting rights & full club access
               </div>
-              <Btn size="sm" variant="primary" className="w-full font-black shadow-orange-500/30" onClick={async () => {
-                const amt = Number(donAmt) > 0 ? Number(donAmt) : 501;
-                const donMonth = `DONATION-${Date.now().toString().slice(-6)}`;
-                const r = await api.upiLink(donMonth, amt, `One-Time Donation by ${user.fname}`);
-                setUpi({ link: r.data.link, amount: amt, memberName: `${user.fname} ${user.lname}`, forMonth: donMonth });
-              }}>Contribute ₹{donAmt || 501} →</Btn>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
+            </CardBody>
+          </Card>
+        </motion.div>
+
+        <motion.div variants={item} className="h-full">
+          <Card className="hover:border-white/20 hover:-translate-y-1 h-full">
+            <CardBody className="p-6 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-white/[0.08] to-white/[0.01] border border-white/[0.1] flex items-center justify-center text-2xl shadow-md">
+                    🏆
+                  </div>
+                  <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                    Good Standing
+                  </span>
+                </div>
+                <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1">Longevity Record</div>
+                <div className="text-2xl font-black text-white tracking-tight mb-2">
+                  {payments.filter(p => p.status === 'CONFIRMED' && !p.forMonth?.startsWith('DONATION')).length} Months
+                </div>
+                <div className="text-sm text-zinc-400 font-medium">Verified dues to date</div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-white/[0.06] text-xs text-emerald-400 font-semibold">
+                Thank you for supporting DACC!
+              </div>
+            </CardBody>
+          </Card>
+        </motion.div>
+
+        <motion.div variants={item} className="h-full">
+          <Card className="hover:border-white/20 hover:-translate-y-1 bg-gradient-to-br from-orange-500/[0.07] to-transparent border-orange-500/30 h-full">
+            <CardBody className="p-6 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-12 h-12 rounded-2xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-2xl shadow-md">
+                    🙏
+                  </div>
+                  <span className="text-[10px] font-bold text-orange-400 bg-orange-500/15 px-2.5 py-1 rounded-full border border-orange-500/30 uppercase tracking-wider">
+                    One-Time Gift
+                  </span>
+                </div>
+                <div className="text-xs font-bold uppercase tracking-wider text-orange-400 mb-1">Voluntary Club Donation</div>
+                <p className="text-xs text-zinc-300 leading-relaxed mb-3">
+                  Support club events or development with any one-time custom amount.
+                </p>
+              </div>
+              <div className="space-y-2.5 mt-auto">
+                <div className="relative">
+                  <span className="absolute left-3 top-2.5 text-zinc-400 font-bold text-sm">₹</span>
+                  <input type="number" value={donAmt} onChange={(e) => setDonAmt(e.target.value)} placeholder="501"
+                    className="w-full pl-7 pr-3 py-2 bg-black/40 border border-white/15 focus:border-orange-500 rounded-xl text-sm font-bold text-white outline-none" />
+                </div>
+                <Btn size="sm" variant="primary" className="w-full font-black shadow-orange-500/30" onClick={async () => {
+                  const amt = Number(donAmt) > 0 ? Number(donAmt) : 501;
+                  const donMonth = `DONATION-${Date.now().toString().slice(-6)}`;
+                  const r = await api.upiLink(donMonth, amt, `One-Time Donation by ${user.fname}`);
+                  setUpi({ link: r.data.link, amount: amt, memberName: `${user.fname} ${user.lname}`, forMonth: donMonth });
+                }}>Contribute ₹{donAmt || 501} →</Btn>
+              </div>
+            </CardBody>
+          </Card>
+        </motion.div>
+      </motion.div>
 
       {/* Announcements & Committee Roster Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

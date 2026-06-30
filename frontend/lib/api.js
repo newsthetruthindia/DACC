@@ -86,10 +86,10 @@ export const api = {
 };
 
 export const PLANS = {
-  REGULAR:  { label:'Standard Member', price:100, color:'#f97316', bg:'#fff7ed' },
-  SILVER:   { label:'Standard Member', price:100, color:'#f97316', bg:'#fff7ed' },
-  GOLD:     { label:'Standard Member', price:100, color:'#f97316', bg:'#fff7ed' },
-  PLATINUM: { label:'Standard Member', price:100, color:'#f97316', bg:'#fff7ed' },
+  REGULAR:  { label:'Standard Member', price:1100, color:'#f97316', bg:'#fff7ed' },
+  SILVER:   { label:'Standard Member', price:1100, color:'#f97316', bg:'#fff7ed' },
+  GOLD:     { label:'Standard Member', price:1100, color:'#f97316', bg:'#fff7ed' },
+  PLATINUM: { label:'Standard Member', price:1100, color:'#f97316', bg:'#fff7ed' },
 };
 
 export const fmtMonth = (ym) => {
