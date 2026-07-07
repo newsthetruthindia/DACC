@@ -1,7 +1,7 @@
 const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM = `Agnichakra Club <${process.env.FROM_EMAIL || 'noreply@agnichakraclub.in'}>`;
+const FROM = `Agnichakra Club <${process.env.FROM_EMAIL || 'noreply@agnichakra.live'}>`;
 
 const base = (content) => `
   <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#fff">

@@ -3,23 +3,24 @@ const conn = new Client();
 
 const commands = `
 set -e
-echo ">>> [1/4] Pulling latest code..."
-cd /root/DACC
-git fetch origin main
-git reset --hard origin/main
+echo ">>> Updating .env on VPS..."
+cd /root/DACC/backend
+if grep -q "FROM_EMAIL" .env; then
+  sed -i 's/^FROM_EMAIL=.*/FROM_EMAIL=noreply@agnichakra.live/' .env
+else
+  echo "FROM_EMAIL=noreply@agnichakra.live" >> .env
+fi
 
-echo ">>> [2/4] Installing dependencies..."
-cd backend
-npm install > /dev/null 2>&1 || true
+if grep -q "FRONTEND_URL" .env; then
+  sed -i 's|^FRONTEND_URL=.*|FRONTEND_URL=https://agnichakra.live|' .env
+else
+  echo "FRONTEND_URL=https://agnichakra.live" >> .env
+fi
 
-echo ">>> [3/4] Running reset script..."
-node reset_launch.js
-
-echo ">>> [4/4] Restarting PM2..."
+echo ">>> Restarting backend..."
 pm2 restart agnichakra-api > /dev/null 2>&1 || true
-pm2 save > /dev/null 2>&1 || true
 
-echo "✅ UPDATE AND RESET COMPLETED SUCCESSFULLY!"
+echo "✅ ALL DONE"
 `;
 
 conn.on('ready', () => {
@@ -27,7 +28,6 @@ conn.on('ready', () => {
   conn.exec(commands, (err, stream) => {
     if (err) throw err;
     stream.on('close', (code) => {
-      console.log(`\n🔒 Connection closed with exit code: ${code}`);
       conn.end();
     }).on('data', d => process.stdout.write(d))
       .stderr.on('data', d => process.stderr.write(d));
