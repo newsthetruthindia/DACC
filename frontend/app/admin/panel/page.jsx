@@ -4,7 +4,7 @@ import AppLayout from '@/components/AppLayout';
 import { Card, CardHeader, CardBody, Btn, Loading, Empty, toast, Badge } from '@/components/ui';
 import { api, PLANS } from '@/lib/api';
 
-const PANEL_ROLES = ['President','Vice President','Secretary','Joint Secretary','Treasurer','Cultural Secretary','Sports Secretary','Captain','Vice Captain','Media Head','Executive Member'];
+const PANEL_ROLES = ['President','Working President','Secretary','Joint Treasurer','Sports Secretary','Cultural Secretary','Executive Member'];
 
 export default function AdminPanelPage() {
   const [panel, setPanel]     = useState([]);

@@ -81,6 +81,7 @@ export default function AppLayout({ children }) {
               <span className="text-[10px] font-mono font-extrabold text-orange-400 tracking-widest uppercase bg-orange-500/10 px-1.5 py-0.5 rounded border border-orange-500/20">
                 ESTD 1962
               </span>
+              <div className="text-[9px] text-zinc-500 mt-0.5 leading-tight">Dharapara, Kolkata 700082</div>
             </div>
           </div>
         </div>

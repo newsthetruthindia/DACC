@@ -6,8 +6,8 @@ const PLANS = {
 };
 
 const PANEL_ROLES = [
-  'President', 'Vice President', 'Secretary',
-  'Joint Secretary', 'Treasurer', 'Cultural Secretary', 'Sports Secretary'
+  'President', 'Working President', 'Secretary',
+  'Joint Treasurer', 'Sports Secretary', 'Cultural Secretary', 'Executive Member'
 ];
 
 const buildUpiLink = (plan, month, customAmount = null, customNote = null) => {

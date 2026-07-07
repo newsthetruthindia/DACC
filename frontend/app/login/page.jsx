@@ -76,7 +76,7 @@ export default function LoginPage() {
             <div className="bg-[#101018]/50 border border-white/[0.06] p-5 rounded-2xl backdrop-blur-md hover:border-orange-500/35 transition-colors group">
               <span className="text-2xl mb-2 block group-hover:scale-110 transition-transform w-fit">🏛️</span>
               <h3 className="text-white font-bold text-sm mb-1">Established 1962</h3>
-              <p className="text-zinc-500 text-xs leading-relaxed">Over six decades of promoting athletic excellence and regional community sports.</p>
+              <p className="text-zinc-500 text-xs leading-relaxed">85, Karunamoyee Ghat Road, Dharapara, Kolkata 700082.</p>
             </div>
             
             <div className="bg-[#101018]/50 border border-white/[0.06] p-5 rounded-2xl backdrop-blur-md hover:border-orange-500/35 transition-colors group">
@@ -198,7 +198,7 @@ export default function LoginPage() {
           </div>
           
           <div className="text-center mt-6 text-[11px] font-semibold text-zinc-600">
-            Agnichakra Sports Club · Confidential Member Portal
+            Agnichakra Sports Club · 85, Karunamoyee Ghat Road, Dharapara, Kolkata 700082
           </div>
         </div>
 
