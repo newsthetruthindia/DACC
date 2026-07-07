@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
+  const [showPass, setShowPass] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault(); setError(''); setLoading(true);
@@ -140,7 +141,17 @@ export default function LoginPage() {
             {tab === 'password' ? (
               <form onSubmit={handleLogin} className="space-y-4">
                 {field('Email Address', { value:email, onChange:e=>setEmail(e.target.value), type:'email', placeholder:'athlete@club.com', required:true })}
-                {field('Password', { value:pass, onChange:e=>setPass(e.target.value), type:'password', placeholder:'••••••••', required:true })}
+                <div className="space-y-2">
+                  <label className="block text-xs font-extrabold uppercase tracking-widest text-zinc-300 ml-1">Password</label>
+                  <div className="relative">
+                    <input value={pass} onChange={e=>setPass(e.target.value)} type={showPass ? 'text' : 'password'} placeholder="••••••••" required
+                      className="w-full px-4.5 py-4 pr-14 bg-[#141420]/90 border border-white/[0.1] rounded-2xl text-sm text-white outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/25 transition-all placeholder:text-zinc-500 shadow-inner font-semibold" />
+                    <button type="button" onClick={() => setShowPass(v => !v)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-orange-400 transition-colors text-sm font-bold select-none">
+                      {showPass ? '🙈 Hide' : '👁️ Show'}
+                    </button>
+                  </div>
+                </div>
                 
                 <div className="pt-2">
                   <button type="submit" disabled={loading} 
