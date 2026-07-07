@@ -16,13 +16,16 @@ async function resetForLaunch() {
   await mongoose.connect(process.env.MONGODB_URI);
   console.log('✅ Connected!\n');
 
-  // 1. Find the super admin
-  const superAdmin = await User.findOne({ role: 'SUPER_ADMIN' });
+  // 1. Promote santrarony9@gmail.com to super admin
+  let superAdmin = await User.findOne({ email: 'santrarony9@gmail.com' });
   if (!superAdmin) {
-    console.error('❌ No SUPER_ADMIN found in the database! Aborting.');
+    console.error('❌ Could not find santrarony9@gmail.com in the database! Aborting.');
     process.exit(1);
   }
-  console.log(`🛡️  Super Admin found: ${superAdmin.fname} ${superAdmin.lname} (${superAdmin.email})`);
+  superAdmin.role = 'SUPER_ADMIN';
+  await superAdmin.save();
+
+  console.log(`🛡️  Super Admin found and promoted: ${superAdmin.fname} ${superAdmin.lname} (${superAdmin.email})`);
   console.log(`   Member ID: ${superAdmin.memberId}`);
   console.log(`   This account will be PRESERVED.\n`);
 
