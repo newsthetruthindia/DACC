@@ -51,10 +51,10 @@ export default function LoginPage() {
       <div className="absolute top-1/4 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[450px] sm:w-[650px] h-[450px] sm:h-[650px] bg-gradient-to-tr from-orange-600/15 via-red-600/10 to-transparent rounded-full blur-[120px] pointer-events-none animate-pulse-glow" />
       <div className="absolute bottom-10 right-1/4 w-[300px] h-[300px] bg-gradient-to-br from-amber-500/10 to-purple-600/10 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 relative z-10 my-auto items-center py-6">
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 relative z-10 my-auto items-center py-6">
         
-        {/* Left Panel: Club Showcase Grid */}
-        <div className="lg:col-span-7 flex flex-col justify-center text-left space-y-6 animate-fade-in pr-0 lg:pr-6">
+        {/* Left Panel: Club Showcase Grid — hidden on mobile, shown on desktop */}
+        <div className="hidden lg:flex lg:col-span-7 flex-col justify-center text-left space-y-6 animate-fade-in pr-0 lg:pr-6">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500/10 to-transparent border border-orange-500/20 px-4 py-2 rounded-full w-fit">
             <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
             <span className="text-orange-400 text-[10px] sm:text-xs font-mono font-extrabold uppercase tracking-widest">
@@ -82,7 +82,7 @@ export default function LoginPage() {
             <div className="bg-[#101018]/50 border border-white/[0.06] p-5 rounded-2xl backdrop-blur-md hover:border-orange-500/35 transition-colors group">
               <span className="text-2xl mb-2 block group-hover:scale-110 transition-transform w-fit">👥</span>
               <h3 className="text-white font-bold text-sm mb-1">Club Membership</h3>
-              <p className="text-zinc-500 text-xs leading-relaxed">Flat monthly contribution of ₹1100. Easy payments and transparent ledger accounts.</p>
+              <p className="text-zinc-500 text-xs leading-relaxed">Flat monthly contribution of ₹100. Easy payments and transparent ledger accounts.</p>
             </div>
 
             <div className="bg-[#101018]/50 border border-white/[0.06] p-5 rounded-2xl backdrop-blur-md hover:border-orange-500/35 transition-colors group">
@@ -99,8 +99,8 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Right Panel: Glassmorphic Login Portal Card */}
-        <div className="lg:col-span-5 w-full max-w-[460px] mx-auto lg:mx-0">
+        {/* Right Panel: Glassmorphic Login Portal Card — first on mobile */}
+        <div className="order-first lg:order-none lg:col-span-5 w-full max-w-[460px] mx-auto lg:mx-0">
           <div className="bg-[#101018]/85 rounded-[36px] border border-white/[0.12] shadow-[0_25px_80px_rgba(0,0,0,0.95)] p-6 sm:p-9 backdrop-blur-3xl relative overflow-hidden">
             {/* Subtle Top Gradient Bar */}
             <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-orange-500 via-amber-500 to-red-600" />

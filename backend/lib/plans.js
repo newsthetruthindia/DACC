@@ -1,8 +1,8 @@
 const PLANS = {
-  REGULAR:  { label: 'Standard Member', price: 1100 },
-  SILVER:   { label: 'Standard Member', price: 1100 },
-  GOLD:     { label: 'Standard Member', price: 1100 },
-  PLATINUM: { label: 'Standard Member', price: 1100 },
+  REGULAR:  { label: 'Standard Member', price: 100 },
+  SILVER:   { label: 'Standard Member', price: 100 },
+  GOLD:     { label: 'Standard Member', price: 100 },
+  PLATINUM: { label: 'Standard Member', price: 100 },
 };
 
 const PANEL_ROLES = [

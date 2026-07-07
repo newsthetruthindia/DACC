@@ -70,7 +70,7 @@ export default function MySubscriptionPage() {
             Financial Ledger Desk
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">💳 My Subscription & Dues</h1>
-          <p className="text-xs sm:text-sm text-zinc-300 mt-1 font-medium">Standard ₹1100/mo club dues & one-time voluntary donation portal.</p>
+          <p className="text-xs sm:text-sm text-zinc-300 mt-1 font-medium">Standard ₹100/mo club dues & one-time voluntary donation portal.</p>
         </div>
         <div className="flex items-center gap-3 bg-[#13131a] p-3.5 sm:p-4 rounded-2xl border border-zinc-800">
           <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-xl">
@@ -80,7 +80,7 @@ export default function MySubscriptionPage() {
             <div className="text-xs text-zinc-400 font-semibold uppercase tracking-wider">Membership Standing</div>
             <div className="text-base font-extrabold text-white flex items-center gap-1.5">
               <span>Standard Member</span>
-              <span className="text-xs text-orange-400 font-mono">(₹1100/mo)</span>
+              <span className="text-xs text-orange-400 font-mono">(₹100/mo)</span>
             </div>
           </div>
         </div>
@@ -91,7 +91,7 @@ export default function MySubscriptionPage() {
         <div className="lg:col-span-7 space-y-6">
           <Card className="bg-[#13131a] border border-zinc-800 shadow-xl overflow-hidden">
             <CardHeader className="border-b border-zinc-800/80 bg-zinc-900/50">
-              <span className="font-extrabold text-base text-white">🗓️ Active Season Dues Ledger (₹1100/mo)</span>
+              <span className="font-extrabold text-base text-white">🗓️ Active Season Dues Ledger (₹100/mo)</span>
             </CardHeader>
             <div className="divide-y divide-zinc-800/80">
               {monthsList.map(mStr => {
@@ -108,7 +108,7 @@ export default function MySubscriptionPage() {
                           {isCur && <span className="px-2 py-0.5 text-[10px] font-black bg-orange-500 text-white rounded-full uppercase">Current Month</span>}
                         </div>
                         <div className="text-xs text-zinc-400 mt-1">
-                          Fixed Membership Contribution: <strong className="text-white">₹1100</strong>
+                          Fixed Membership Contribution: <strong className="text-white">₹100</strong>
                         </div>
                       </div>
 
@@ -120,9 +120,9 @@ export default function MySubscriptionPage() {
                             variant={status === 'PENDING' ? 'secondary' : 'primary'}
                             onClick={async () => {
                               const r = await api.upiLink(mStr);
-                              setUpiModal({ link: r.data.link, amount: r.data.amount || 1100, month: mStr, memberName: `${user.fname} ${user.lname}` });
+                              setUpiModal({ link: r.data.link, amount: r.data.amount || 100, month: mStr, memberName: `${user.fname} ${user.lname}` });
                             }}>
-                            {status === 'PENDING' ? 'Re-Pay / View QR' : 'Pay ₹1100 via UPI →'}
+                            {status === 'PENDING' ? 'Re-Pay / View QR' : 'Pay ₹100 via UPI →'}
                           </Btn>
                         )}
                       </div>

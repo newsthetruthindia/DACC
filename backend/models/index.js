@@ -18,6 +18,7 @@ const UserSchema = new Schema({
   plan:         { type: String, enum: ['SILVER', 'GOLD', 'PLATINUM'], default: 'SILVER' },
   role:         { type: String, enum: ['MEMBER', 'PANEL', 'ACCOUNTANT', 'SUPER_ADMIN'], default: 'MEMBER' },
   status:       { type: String, enum: ['PENDING', 'ACTIVE', 'SUSPENDED', 'INACTIVE'], default: 'PENDING' },
+  referredBy:   { type: String, default: null },
   joinedAt:     { type: Date, default: Date.now },
 }, { timestamps: true });
 

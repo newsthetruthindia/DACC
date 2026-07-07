@@ -6,14 +6,14 @@ import { api, saveAuth, PLANS, compressImage, resolveImgUrl } from '@/lib/api';
 import { Btn } from '@/components/ui';
 
 const PLAN_LIST = [
-  { key:'REGULAR', features:['Full Portal & Community Access','Event Invites & Club Voting Rights','Standard ₹1100/Month Dues','Optional One-Time Club Donation Supported'] },
+  { key:'REGULAR', features:['Full Portal & Community Access','Event Invites & Club Voting Rights','Standard ₹100/Month Dues','Optional One-Time Club Donation Supported'] },
 ];
 
 export default function RegisterPage() {
   const router = useRouter();
   const [step, setStep]     = useState(1);
   const [plan, setPlan]     = useState('REGULAR');
-  const [form, setForm]     = useState({ fname:'', lname:'', email:'', phone:'', password:'', confirm:'', city:'', aadhaar:'', selfieUrl:'' });
+  const [form, setForm]     = useState({ fname:'', lname:'', email:'', phone:'', password:'', confirm:'', city:'', aadhaar:'', selfieUrl:'', referenceCode:'' });
   const [loading, setLoading] = useState(false);
   const [error, setError]   = useState('');
   const [upiData, setUpiData] = useState(null);
@@ -42,6 +42,8 @@ export default function RegisterPage() {
       return setError('Please upload your profile selfie photo');
     if (form.password !== form.confirm) return setError('Passwords do not match');
     if (form.password.length < 6) return setError('Password must be at least 6 characters');
+    if (!form.referenceCode || !form.referenceCode.trim())
+      return setError('Reference code is required. Ask an existing club member for their Member ID.');
     setStep(2);
   };
 
@@ -133,6 +135,14 @@ export default function RegisterPage() {
                 {field('Password *','password','password','Min 6 chars')}
                 {field('Confirm Password *','confirm','password','Re-enter')}
               </div>
+
+              {/* Reference Code */}
+              <div className="p-3.5 sm:p-4 bg-amber-950/30 border border-amber-500/20 rounded-2xl">
+                <label className="block text-xs font-bold text-amber-300 mb-1.5">🔗 Reference Code (Existing Member ID) <span className="text-orange-400">*</span></label>
+                <p className="text-[11px] text-zinc-400 mb-2">You must be referred by an existing club member. Enter their Member ID (e.g., AGC-123456).</p>
+                <input value={form.referenceCode} onChange={set('referenceCode')} type="text" placeholder="AGC-XXXXXX"
+                  className="w-full px-4 py-3 border border-amber-500/30 rounded-xl text-sm bg-[#1a1a22] text-white font-mono tracking-wider outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/25 placeholder:text-zinc-500 placeholder:tracking-normal placeholder:font-sans uppercase" />
+              </div>
               
               <button type="submit" className="w-full py-3.5 primary-btn rounded-xl font-bold text-sm shadow-lg mt-6">
                 Continue to Contribution Confirmation →
@@ -147,7 +157,7 @@ export default function RegisterPage() {
           {step === 2 && (
             <div>
               <h2 className="font-bold text-white text-base mb-1">Confirm Standard Membership</h2>
-              <p className="text-zinc-400 text-xs mb-5">All club members enjoy equal privileges at a flat ₹1100/month contribution.</p>
+              <p className="text-zinc-400 text-xs mb-5">All club members enjoy equal privileges at a flat ₹100/month contribution.</p>
               <div className="space-y-3 mb-6">
                 {PLAN_LIST.map(p => {
                   const info = PLANS[p.key] || PLANS.REGULAR;
@@ -166,7 +176,7 @@ export default function RegisterPage() {
                       <div className="text-left sm:text-right pt-2 sm:pt-0 border-t sm:border-0 border-zinc-800/80 flex sm:block justify-between items-baseline">
                         <div className="text-xs text-zinc-400 sm:hidden">Price:</div>
                         <div>
-                          <span className="text-2xl font-black text-white">₹1100</span>
+                          <span className="text-2xl font-black text-white">₹100</span>
                           <span className="text-[10px] text-zinc-400 font-medium ml-1 sm:ml-0 sm:block">per month</span>
                         </div>
                       </div>
@@ -180,7 +190,7 @@ export default function RegisterPage() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <button onClick={() => setStep(1)} className="w-full sm:w-auto px-5 py-3.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-semibold text-sm transition-all order-2 sm:order-1">← Back</button>
                 <button onClick={handleRegister} disabled={loading} className="w-full sm:flex-1 py-3.5 primary-btn rounded-xl font-bold text-sm shadow-lg disabled:opacity-50 order-1 sm:order-2">
-                  {loading ? 'Registering...' : 'Register & Pay Initial ₹1100 Dues →'}
+                  {loading ? 'Registering...' : 'Register & Pay Initial ₹100 Dues →'}
                 </button>
               </div>
             </div>

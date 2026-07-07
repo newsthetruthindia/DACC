@@ -134,13 +134,13 @@ export default function DashboardPage() {
                 <div className={`text-2xl font-black tracking-tight mb-2 ${isPaid ? 'text-emerald-400' : 'text-orange-400'}`}>
                   {isPaid ? 'Dues Paid' : 'Payment Due'}
                 </div>
-                <div className="text-sm text-zinc-400 font-medium">Standard Dues: <span className="text-white font-extrabold">₹1100</span></div>
+                <div className="text-sm text-zinc-400 font-medium">Standard Dues: <span className="text-white font-extrabold">₹100</span></div>
               </div>
               {!isPaid && (
                 <Btn size="sm" variant="primary" className="mt-5 w-full font-black shadow-orange-500/20" onClick={async () => {
                   const r = await api.upiLink(month);
-                  setUpi({ link: r.data.link, amount: r.data.amount || 1100, memberName: `${user.fname} ${user.lname}`, forMonth: month });
-                }}>Pay ₹1100 Now</Btn>
+                  setUpi({ link: r.data.link, amount: r.data.amount || 100, memberName: `${user.fname} ${user.lname}`, forMonth: month });
+                }}>Pay ₹100 Now</Btn>
               )}
               {thisPay?.status === 'PENDING' && (
                 <div className="mt-4 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs font-bold flex items-center gap-2">

@@ -9,25 +9,30 @@ const { sendGroupAlert } = require('../lib/telegram');
 // ── POST /auth/register ───────────────────────────────────────
 router.post('/register', async (req, res) => {
   try {
-    const { fname, lname, email, phone, password, city, plan = 'SILVER', aadhaar, selfieUrl } = req.body;
+    const { fname, lname, email, phone, password, city, plan = 'SILVER', aadhaar, selfieUrl, referenceCode } = req.body;
     if (!fname || !lname || !email || !phone || !password || !aadhaar)
       return res.status(400).json({ success: false, error: 'All fields including Aadhaar number are required' });
     if (!/^\d{12}$/.test(aadhaar.trim()))
       return res.status(400).json({ success: false, error: 'Aadhaar number must be exactly 12 digits' });
     if (!PLANS[plan])
       return res.status(400).json({ success: false, error: 'Invalid plan' });
+    if (!referenceCode || !referenceCode.trim())
+      return res.status(400).json({ success: false, error: 'Reference code (existing member ID) is required for registration' });
+    const referrer = await User.findOne({ memberId: referenceCode.trim().toUpperCase() });
+    if (!referrer)
+      return res.status(400).json({ success: false, error: 'Invalid reference code. Please enter a valid existing member ID (e.g., AGC-123456)' });
     if (await User.findOne({ $or: [{ email }, { phone }, { aadhaar: aadhaar.trim() }] }))
       return res.status(409).json({ success: false, error: 'Email, phone, or Aadhaar already registered' });
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = await User.create({ fname, lname, email, phone, passwordHash, city, plan, status: 'PENDING', aadhaar: aadhaar.trim(), selfieUrl: selfieUrl || null });
+    const user = await User.create({ fname, lname, email, phone, passwordHash, city, plan, status: 'PENDING', aadhaar: aadhaar.trim(), selfieUrl: selfieUrl || null, referredBy: referenceCode.trim().toUpperCase() });
 
     const month = currentMonth();
     const upiLink = buildUpiLink(plan, month);
 
     // Send welcome email & Telegram KYC alert (non-blocking)
     sendWelcome(email, fname, PLANS[plan].label).catch(console.error);
-    sendGroupAlert(`🚨 <b>New Athlete Registration (KYC Pending)</b>\n\n<b>Name:</b> ${fname} ${lname}\n<b>Phone:</b> ${phone}\n<b>Division:</b> ${PLANS[plan].label}\n<b>Aadhaar:</b> •••• •••• ${aadhaar.trim().slice(-4)}\n\n⚠️ <i>Accountants & Admin: Please verify selfie and dues on portal to approve KYC!</i>`).catch(console.error);
+    sendGroupAlert(`🚨 <b>New Athlete Registration (KYC Pending)</b>\n\n<b>Name:</b> ${fname} ${lname}\n<b>Phone:</b> ${phone}\n<b>Division:</b> ${PLANS[plan].label}\n<b>Aadhaar:</b> •••• •••• ${aadhaar.trim().slice(-4)}\n<b>Referred By:</b> ${referrer.fname} ${referrer.lname} (${referrer.memberId})\n\n⚠️ <i>Accountants & Admin: Please verify selfie and dues on portal to approve KYC!</i>`).catch(console.error);
 
     res.status(201).json({
       success: true,
